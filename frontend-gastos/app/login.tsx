@@ -6,8 +6,10 @@ export default function LoginScreen() {
   const router = useRouter();
 
   const handleLogin = () => {
-    router.push('/');
+    router.push('/myGroups');
   };
+  
+
   const handleSignUp = () => {
     router.push('/sign-up'); // Ajusta la ruta a la pantalla de registro
   };
