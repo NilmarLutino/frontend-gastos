@@ -1,7 +1,17 @@
 import React from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import { useRouter } from 'expo-router';
 
 export default function LoginScreen() {
+  const router = useRouter();
+
+  const handleLogin = () => {
+    router.push('/');
+  };
+  const handleSignUp = () => {
+    router.push('/sign-up'); // Ajusta la ruta a la pantalla de registro
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.logoContainer}>
@@ -19,13 +29,13 @@ export default function LoginScreen() {
           secureTextEntry
         />
 
-        <TouchableOpacity style={styles.button}>
+        <TouchableOpacity style={styles.button} onPress={handleLogin}>
           <Text style={styles.buttonText}>Ingresar</Text>
         </TouchableOpacity>
 
         <Text style={styles.forgotText}>¿Olvidaste tu contraseña?</Text>
 
-        <TouchableOpacity>
+        <TouchableOpacity onPress={handleSignUp}>
           <Text style={styles.registerText}>No tienes cuenta? Regístrate aquí</Text>
         </TouchableOpacity>
       </View>
@@ -36,7 +46,7 @@ export default function LoginScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000', // Fondo negro como en la imagen
+    backgroundColor: '#000',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -46,10 +56,10 @@ const styles = StyleSheet.create({
   },
   logoText: {
     fontSize: 24,
-    color: '#fff', // Color blanco para el texto del logo
+    color: '#fff',
   },
   formContainer: {
-    backgroundColor: '#fff', // Fondo blanco para el formulario
+    backgroundColor: '#fff',
     padding: 20,
     borderRadius: 10,
     width: '80%',
@@ -68,26 +78,26 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     paddingHorizontal: 10,
     marginBottom: 15,
-    backgroundColor: '#EAEAEA', // Color de fondo de los inputs
+    backgroundColor: '#EAEAEA',
   },
   button: {
     width: '100%',
-    backgroundColor: '#000', // Botón negro
+    backgroundColor: '#000',
     paddingVertical: 10,
     borderRadius: 5,
     alignItems: 'center',
     marginBottom: 15,
   },
   buttonText: {
-    color: '#fff', // Texto del botón en blanco
+    color: '#fff',
     fontSize: 16,
   },
   forgotText: {
-    color: '#666', // Color gris para el texto de "¿Olvidaste tu contraseña?"
+    color: '#666',
     marginBottom: 10,
   },
   registerText: {
-    color: '#0000FF', // Azul para el texto de "Regístrate aquí"
+    color: '#0000FF',
     textDecorationLine: 'underline',
   },
 });
