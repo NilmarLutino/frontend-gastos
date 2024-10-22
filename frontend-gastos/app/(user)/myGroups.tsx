@@ -1,7 +1,9 @@
 import { useUser, useAuth } from "@clerk/clerk-expo";
-import { Text, View, Button, StyleSheet } from "react-native";
+import { Text, View, Button, StyleSheet, FlatList } from "react-native";
 import React from "react";
 import { useRouter } from "expo-router";
+import BottomNavbar from "../../components/BottomNavbar";
+import GroupCard from "../../components/GroupCard";
 
 export default function MyGroups() {
   const { user } = useUser();
@@ -17,12 +19,48 @@ export default function MyGroups() {
     }
   };
 
+  // Datos de ejemplo para los grupos
+  const groups = [
+    {
+      groupId: "1",
+      groupName: "Grupo #3 Salida TechZone",
+      date: "Oct 10",
+      members: 3,
+      expenses: 15,
+      paid: 2,
+    },
+    {
+      groupId: "2",
+      groupName: "Grupo #4 Salida Pollos Copacabana",
+      date: "Oct 12",
+      members: 5,
+      expenses: 10,
+      paid: 2,
+    },
+  ];
+
   return (
     <View style={styles.container}>
       <Text style={styles.welcomeText}>
         Welcome to My Groups, {user?.emailAddresses[0].emailAddress}
       </Text>
+      <FlatList
+        data={groups}
+        renderItem={({ item }) => (
+          <GroupCard
+            groupId={item.groupId}
+            groupName={item.groupName}
+            date={item.date}
+            members={item.members}
+            expenses={item.expenses}
+            paid={item.paid}
+          />
+        )}
+        keyExtractor={(item) => item.groupId}
+        contentContainerStyle={styles.groupList}
+      />
       <Button title="Sign Out" onPress={handleSignOut} />
+      <BottomNavbar />
     </View>
   );
 }
@@ -30,11 +68,16 @@ export default function MyGroups() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
+    padding: 10,
+    paddingBottom: 60,
+    backgroundColor: "#ffffff",
   },
   welcomeText: {
     fontSize: 18,
     marginBottom: 20,
+    textAlign: "center",
+  },
+  groupList: {
+    paddingBottom: 20,
   },
 });
