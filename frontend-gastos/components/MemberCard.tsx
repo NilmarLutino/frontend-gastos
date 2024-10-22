@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { View, Text, StyleSheet, TouchableOpacity, FlatList, Button } from "react-native";
 import { FontAwesome } from "@expo/vector-icons";
+import AddExpenses from "./modals/addExpenses";
 
 type Expense = {
   item: string;
@@ -18,9 +19,18 @@ type MemberCardProps = {
 
 export default function MemberCard({ member }: MemberCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
+  const [isAddExpensesVisible, setAddExpensesVisible] = useState(false); // Estado para el modal
+  const [newExpenses, setNewExpenses] = useState<Expense[]>([]); // Estado para manejar los nuevos gastos
 
   const toggleExpand = () => {
     setIsExpanded(!isExpanded);
+  };
+
+  // Función para manejar la adición de un nuevo gasto
+  const handleAgregarGasto = (concepto: string, monto: string) => {
+    const newExpense: Expense = { item: concepto, amount: parseFloat(monto) };
+    setNewExpenses([...newExpenses, newExpense]); // Actualizar la lista de gastos
+    setAddExpensesVisible(false); // Cerrar el modal
   };
 
   return (
@@ -33,7 +43,7 @@ export default function MemberCard({ member }: MemberCardProps) {
       {isExpanded && (
         <View style={styles.expandedContent}>
           <FlatList
-            data={member.expenses}
+            data={[...member.expenses, ...newExpenses]} // Mostrar tanto los gastos originales como los nuevos
             renderItem={({ item }) => (
               <View style={styles.expenseItem}>
                 <Text style={styles.expenseText}>{item.item}</Text>
@@ -43,9 +53,16 @@ export default function MemberCard({ member }: MemberCardProps) {
             keyExtractor={(item, index) => index.toString()}
           />
           <Button title="Comprobantes" onPress={() => console.log("Ver Comprobantes de", member.name)} />
-          <Button title="Agregar Gasto" onPress={() => console.log("Agregar Gasto para", member.name)} />
+          <Button title="Agregar Gasto" onPress={() => setAddExpensesVisible(true)} /> {/* Abre el modal */}
         </View>
       )}
+      
+      {/* Modal para añadir gastos */}
+      <AddExpenses
+        visible={isAddExpensesVisible}
+        onClose={() => setAddExpensesVisible(false)} // Cerrar el modal
+        onAgregar={handleAgregarGasto} // Manejar la adición de gastos
+      />
     </View>
   );
 }
