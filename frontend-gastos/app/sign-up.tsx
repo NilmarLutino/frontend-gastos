@@ -18,7 +18,7 @@ export default function SignUpScreen() {
 
       if (signUp && signUp.emailAddress) {
         setEmailAddress(signUp.emailAddress);
-        router.push('/username');
+        router.push({ pathname: '/username', params: { email: signUp.emailAddress } });
       } else {
         console.error('OAuth registration was not completed.');
       }
@@ -27,11 +27,33 @@ export default function SignUpScreen() {
     }
   };
 
+  const handleSignUpWithEmail = async () => {
+    if (!isLoaded || !emailAddress) return;
+
+    try {
+      await signUp.create({ emailAddress });
+      await signUp.prepareEmailAddressVerification({ strategy: 'email_code' });
+      router.push('/verify-email');
+    } catch (error) {
+      console.error('Error during sign-up with email:', error);
+    }
+  };
+
   return (
     <View style={styles.container}>
       <Text style={styles.logoText}>LOGO</Text>
+      <TextInput
+        style={styles.input}
+        autoCapitalize="none"
+        value={emailAddress}
+        placeholder="Email..."
+        onChangeText={(email) => setEmailAddress(email)}
+      />
+      <TouchableOpacity style={styles.button} onPress={handleSignUpWithEmail}>
+        <Text style={styles.buttonText}>Sign Up with Email</Text>
+      </TouchableOpacity>
       <TouchableOpacity style={styles.button} onPress={handleSignUpWithGoogle}>
-        <Text style={styles.buttonText}>Sign up with Google</Text>
+        <Text style={styles.buttonText}>Sign Up with Google</Text>
       </TouchableOpacity>
     </View>
   );
@@ -49,6 +71,15 @@ const styles = StyleSheet.create({
     fontSize: 24,
     color: '#fff',
     marginBottom: 20,
+  },
+  input: {
+    width: '100%',
+    padding: 10,
+    marginVertical: 10,
+    borderColor: '#ccc',
+    borderWidth: 1,
+    borderRadius: 5,
+    backgroundColor: '#EAEAEA',
   },
   button: {
     backgroundColor: '#4285F4',

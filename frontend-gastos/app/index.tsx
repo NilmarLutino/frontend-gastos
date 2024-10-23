@@ -1,19 +1,23 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
   TouchableOpacity,
-  TextInput,
   StyleSheet,
+  Alert,
 } from "react-native";
 import { useRouter } from "expo-router";
-import { useOAuth, useUser } from "@clerk/clerk-expo";
+import { useOAuth, useUser, useSession } from "@clerk/clerk-expo";
 import * as Linking from "expo-linking";
+import axios from "axios";
+import { EmailAddressResource } from "@clerk/types";
 
 export default function LoginScreen() {
   const router = useRouter();
   const { startOAuthFlow } = useOAuth({ strategy: "oauth_google" });
   const { user, isSignedIn } = useUser();
+  const { session } = useSession();
+  const [loading, setLoading] = useState(false);
 
   const handleLoginWithGoogle = async () => {
     try {
@@ -23,8 +27,7 @@ export default function LoginScreen() {
 
       if (createdSessionId) {
         await setActive!({ session: createdSessionId });
-        console.log("User Info:", user);
-        router.push("/(user)/myGroups");
+        console.log("Session set, waiting for user data...");
       } else {
         console.error("OAuth login was not completed.");
       }
@@ -37,41 +40,56 @@ export default function LoginScreen() {
     router.push("/sign-up");
   };
 
-  React.useEffect(() => {
-    if (isSignedIn) {
-      router.push("/(user)/myGroups");
+  useEffect(() => {
+    const fetchUserFromBackend = async (email: string) => {
+      try {
+        setLoading(true);
+        const response = await axios.get(`http://localhost:3000/api/usuarios/email/${email}`);
+        console.log("User data from backend:", response.data);
+
+        if (response.data) {
+          console.log("User data found:", response.data);
+          router.push("/(user)/myGroups");
+        } else {
+          Alert.alert("Error", "User data not found in backend.");
+        }
+      } catch (error) {
+        console.error("Error fetching user from backend:", error);
+        Alert.alert("Error", "Failed to fetch user data from backend.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (isSignedIn && user) {
+      console.log("User Info:", {
+        id: user.id,
+        primaryEmailAddress: user.primaryEmailAddress,
+        username: user.username,
+        createdAt: user.createdAt,
+        publicMetadata: user.publicMetadata,
+      });
+
+      // Llamada al backend para obtener la información del usuario usando el email
+      const email = user.primaryEmailAddress?.emailAddress;
+      if (email) {
+        fetchUserFromBackend(email);
+      }
+    } else if (session && !user) {
+      console.log("Session is active but user data is not yet loaded.");
     }
-  }, [isSignedIn]);
+  }, [isSignedIn, user, session]);
 
   return (
     <View style={styles.container}>
       <Text style={styles.logoText}>LOGO</Text>
-      <View style={styles.formContainer}>
-        <TextInput
-          style={styles.input}
-          placeholder="Email"
-          placeholderTextColor="#ccc"
-          autoCapitalize="none"
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="Password"
-          placeholderTextColor="#ccc"
-          secureTextEntry
-        />
-        <TouchableOpacity style={styles.button}>
-          <Text style={styles.buttonText}>Iniciar Sesión</Text>
-        </TouchableOpacity>
-      </View>
-
-      <TouchableOpacity style={styles.button} onPress={handleLoginWithGoogle}>
-        <Text style={styles.buttonText}>Sign in with Google</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity onPress={handleSignUp}>
-        <Text style={styles.registerText}>
-          No tienes cuenta? Regístrate aquí
+      <TouchableOpacity style={styles.button} onPress={handleLoginWithGoogle} disabled={loading}>
+        <Text style={styles.buttonText}>
+          {loading ? "Signing in..." : "Sign in with Google"}
         </Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.button} onPress={handleSignUp}>
+        <Text style={styles.buttonText}>Sign Up</Text>
       </TouchableOpacity>
     </View>
   );
@@ -89,23 +107,6 @@ const styles = StyleSheet.create({
     color: "#fff",
     marginBottom: 20,
   },
-  formContainer: {
-    backgroundColor: "#fff",
-    padding: 20,
-    borderRadius: 10,
-    width: "80%",
-    alignItems: "center",
-  },
-  input: {
-    width: "100%",
-    height: 40,
-    borderColor: "#ccc",
-    borderWidth: 1,
-    borderRadius: 5,
-    paddingHorizontal: 10,
-    marginBottom: 15,
-    backgroundColor: "#EAEAEA",
-  },
   button: {
     backgroundColor: "#4285F4",
     paddingVertical: 10,
@@ -116,9 +117,5 @@ const styles = StyleSheet.create({
   buttonText: {
     color: "#fff",
     fontSize: 16,
-  },
-  registerText: {
-    color: "#0000FF",
-    textDecorationLine: "underline",
   },
 });

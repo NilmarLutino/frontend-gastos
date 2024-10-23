@@ -1,7 +1,8 @@
 import * as React from 'react';
-import { TextInput, Button, View, StyleSheet, Text } from 'react-native';
+import { TextInput, Button, View, StyleSheet, Text, Alert } from 'react-native';
 import { useSignUp } from '@clerk/clerk-expo';
 import { useRouter } from 'expo-router';
+import axios from 'axios';
 
 export default function UsernameScreen() {
   const { isLoaded, signUp, setActive } = useSignUp();
@@ -19,7 +20,6 @@ export default function UsernameScreen() {
     }
 
     try {
-      // Completar el registro con el `username` y `password`.
       const completeSignUp = await signUp.update({
         username,
         password,
@@ -27,12 +27,29 @@ export default function UsernameScreen() {
 
       if (completeSignUp.status === 'complete') {
         await setActive({ session: completeSignUp.createdSessionId });
-        router.replace('/(user)/myGroups');
+
+        const userData = {
+          nombre: username,
+          email: completeSignUp.emailAddress, 
+          contrasena: password,
+          roles_id: 1, 
+        };
+
+        try {
+          const response = await axios.post('http://localhost:3000/api/usuarios/', userData);
+          console.log('User registered in backend:', response.data);
+          Alert.alert('Success', 'User registered successfully!');
+          router.replace('/(user)/myGroups');
+        } catch (backendError) {
+          console.error('Error registering user in backend:', backendError);
+          Alert.alert('Error', 'Failed to register user in the backend.');
+        }
       } else {
         console.error('Sign-up completion failed:', JSON.stringify(completeSignUp, null, 2));
       }
-    } catch (err) {
-      console.error('Error completing sign-up:', JSON.stringify(err, null, 2));
+    } catch (error) {
+      console.error('Error completing sign-up:', error);
+      Alert.alert('Error', 'Failed to complete sign-up.');
     }
   };
 
@@ -62,7 +79,7 @@ export default function UsernameScreen() {
       <Button title="Complete Sign-Up" onPress={onCompleteSignUp} />
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
