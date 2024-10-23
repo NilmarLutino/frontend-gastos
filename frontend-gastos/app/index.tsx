@@ -24,7 +24,7 @@ export default function LoginScreen() {
       if (createdSessionId) {
         await setActive!({ session: createdSessionId });
         console.log("User Info:", user);
-        router.push({ pathname: "/(user)/myGroups" });
+        router.push("/(user)/myGroups");
       } else {
         console.error("OAuth login was not completed.");
       }
@@ -34,13 +34,12 @@ export default function LoginScreen() {
   };
 
   const handleSignUp = () => {
-    router.push({ pathname: "/sign-up" });
+    router.push("/sign-up");
   };
 
-  // Muestra un mensaje si el usuario ya está registrado
   React.useEffect(() => {
     if (isSignedIn) {
-      router.push({ pathname: "/(user)/myGroups" });
+      router.push("/(user)/myGroups");
     }
   }, [isSignedIn]);
 
