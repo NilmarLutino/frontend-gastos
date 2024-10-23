@@ -39,7 +39,6 @@ export default function GroupCard({
       <TouchableOpacity style={styles.detailsButton} onPress={handleDetails}>
         <Text style={styles.detailsButtonText}>Ver detalles</Text>
       </TouchableOpacity>
-      <FontAwesome name="star-o" size={24} color="#000" style={styles.favoriteIcon} />
     </View>
   );
 }

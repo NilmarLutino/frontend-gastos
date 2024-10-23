@@ -2,6 +2,7 @@ import React from "react";
 import { View, TouchableOpacity, Text, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
 import { FontAwesome } from "@expo/vector-icons";
+import { useUser, useAuth } from "@clerk/clerk-expo";
 
 // Define los tipos de las propiedades que acepta el componente
 type BottomNavbarProps = {
@@ -14,6 +15,19 @@ export default function BottomNavbar({
   actionPath = "./CreateGroup", // Valor por defecto si no se proporciona
 }: BottomNavbarProps) {
   const router = useRouter();
+  const { signOut } = useAuth();
+
+
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+      router.replace("/");
+    } catch (error) {
+      console.error("Error during sign out:", error);
+    }
+  };
+
+  
 
   return (
     <View style={styles.navbar}>
@@ -33,12 +47,12 @@ export default function BottomNavbar({
         <Text style={styles.navText}>{actionLabel}</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity
+      <TouchableOpacity 
         style={styles.navItem}
-        onPress={() => router.push({ pathname: "./more" })}
-      >
-        <FontAwesome name="ellipsis-h" size={24} color="black" />
-        <Text style={styles.navText}>Más</Text>
+        onPress={handleSignOut}>
+        <FontAwesome name="sign-out" size={24} color="black" />
+        <Text style={styles.navText}>Cerrar sesión</Text>
+        
       </TouchableOpacity>
     </View>
   );
