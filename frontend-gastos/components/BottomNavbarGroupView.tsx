@@ -3,6 +3,7 @@ import { View, TouchableOpacity, Text, StyleSheet, Alert } from "react-native";
 import { useRouter } from "expo-router";
 import { FontAwesome } from "@expo/vector-icons";
 import { useAuth } from "@clerk/clerk-expo";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 
 interface BottomNavbarGroupViewProps {
@@ -22,12 +23,17 @@ export default function BottomNavbarGroupView({
   const handleSignOut = async () => {
     try {
       await signOut();
-      router.replace("/"); // Redirige a la página principal u otra página después de cerrar sesión
+      await AsyncStorage.removeItem("userId"); // Elimina el userId de AsyncStorage
+      console.log("User ID removed from storage.");
+      router.replace("/"); // Redirige al usuario a la página principal o de inicio de sesión
     } catch (error) {
       console.error("Error during sign out:", error);
-      Alert.alert("Error", "Ocurrió un error al cerrar la sesión.");
+      Alert.alert("Error", "Failed to sign out. Please try again.");
     }
   };
+  
+
+
   return (
     <View style={styles.navbar}>
       <TouchableOpacity style={styles.navItem }         

@@ -1,8 +1,10 @@
 import React from "react";
-import { View, TouchableOpacity, Text, StyleSheet } from "react-native";
+import { View, TouchableOpacity, Text, StyleSheet, Alert } from "react-native";
 import { useRouter } from "expo-router";
 import { FontAwesome } from "@expo/vector-icons";
 import { useUser, useAuth } from "@clerk/clerk-expo";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
 
 // Define los tipos de las propiedades que acepta el componente
 type BottomNavbarProps = {
@@ -21,9 +23,12 @@ export default function BottomNavbar({
   const handleSignOut = async () => {
     try {
       await signOut();
-      router.replace("/");
+      await AsyncStorage.removeItem("userId"); // Elimina el userId de AsyncStorage
+      console.log("User ID removed from storage.");
+      router.replace("/"); // Redirige al usuario a la página principal o de inicio de sesión
     } catch (error) {
       console.error("Error during sign out:", error);
+      Alert.alert("Error", "Failed to sign out. Please try again.");
     }
   };
 
@@ -33,7 +38,7 @@ export default function BottomNavbar({
     <View style={styles.navbar}>
       <TouchableOpacity
         style={styles.navItem}
-        onPress={() => router.push({ pathname: "./profile" })}
+        onPress={() => router.push({ pathname: "./UserProfile" })}
       >
         <FontAwesome name="user" size={24} color="black" />
         <Text style={styles.navText}>Mi perfil</Text>
