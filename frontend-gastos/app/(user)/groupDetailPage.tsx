@@ -20,14 +20,22 @@ export default function GroupDetailPage() {
   };
 
   const members = [
-    { id: "1", name: "Integrante 1", balance: 57, expenses: [] },
-    { id: "2", name: "Integrante 2", balance: 57, expenses: [] },
-    { id: "3", name: "Integrante 3", balance: 57, expenses: [] },
+    { id: "1", name: "Integrante 1", balance: 57, expenses: [
+      { item: "Comida", amount: 25 },
+      { item: "Juegos", amount: 32 },
+    ] },
+    { id: "2", name: "Integrante 2", balance: 57, expenses: [
+      { item: "Comida", amount: 25 },
+      { item: "Juegos", amount: 32 },
+    ] },
+    { id: "3", name: "Integrante 3", balance: 57, expenses: [
+      { item: "Comida", amount: 25 },
+      { item: "Juegos", amount: 32 },
+    ] },
   ];
 
   // Estados para controlar la visibilidad de los modales
   const [isAddMemberVisible, setAddMemberVisible] = useState(false);
-  const [isAddExpensesVisible, setAddExpensesVisible] = useState(false);
   const [isModalErrorVisible, setModalErrorVisible] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
@@ -73,4 +81,5 @@ const styles = StyleSheet.create({
     backgroundColor: "#f9f9f9",
     paddingBottom: 60, // Ajuste para que el contenido no se superponga con el navbar
   },
+  
 });

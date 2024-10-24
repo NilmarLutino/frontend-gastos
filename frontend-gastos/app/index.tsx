@@ -9,6 +9,7 @@ import {
 import { useRouter } from "expo-router";
 import { useOAuth, useUser } from "@clerk/clerk-expo";
 import * as Linking from "expo-linking";
+import { FontAwesome } from "@expo/vector-icons";
 
 export default function LoginScreen() {
   const router = useRouter();
@@ -45,34 +46,39 @@ export default function LoginScreen() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.logoText}>LOGO</Text>
       <View style={styles.formContainer}>
+        <Text style={styles.logoText}>LOGO</Text>
+        <Text style={styles.labelText}>Correo:</Text>
         <TextInput
           style={styles.input}
-          placeholder="Email"
-          placeholderTextColor="#ccc"
           autoCapitalize="none"
+          keyboardType="email-address"
+          placeholder="Ingrese su correo..."
+          placeholderTextColor={"#ccc"}
         />
+        <Text style={styles.labelText}>Contraseña:</Text>
         <TextInput
           style={styles.input}
-          placeholder="Password"
-          placeholderTextColor="#ccc"
           secureTextEntry
+          autoCapitalize="none"
+          placeholder="Ingrese su contraseña..."
+          placeholderTextColor={"#ccc"}
         />
         <TouchableOpacity style={styles.button}>
           <Text style={styles.buttonText}>Iniciar Sesión</Text>
         </TouchableOpacity>
-      </View>
-
       <TouchableOpacity style={styles.button} onPress={handleLoginWithGoogle}>
-        <Text style={styles.buttonText}>Sign in with Google</Text>
+        <Text style={styles.buttonText}>Ingresar con Google
+        <FontAwesome style={styles.icon} name="google" size={16} color="#f2f2f2" />
+        </Text>
       </TouchableOpacity>
-
       <TouchableOpacity onPress={handleSignUp}>
         <Text style={styles.registerText}>
           No tienes cuenta? Regístrate aquí
         </Text>
       </TouchableOpacity>
+      </View>
+
     </View>
   );
 }
@@ -80,45 +86,67 @@ export default function LoginScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#000",
+    gap: 20,
+    backgroundColor: "#ece2d9",
     justifyContent: "center",
     alignItems: "center",
   },
   logoText: {
-    fontSize: 24,
-    color: "#fff",
+    fontSize: 30,
+    fontWeight: "bold",
+    color: "#262626",
     marginBottom: 20,
+    alignSelf: "center",
+  },
+  labelText: {
+    fontSize: 16,
+    color: "#262626",
+    marginBottom: 5,
+    fontWeight: "500",
+    textAlign: "left",
   },
   formContainer: {
-    backgroundColor: "#fff",
+    backgroundColor: "#f2f2f2",
     padding: 20,
-    borderRadius: 10,
-    width: "80%",
-    alignItems: "center",
+    borderRadius: 20,
+    width: "70%",
+    shadowColor: "#000",
+    shadowOffset: { width: 3, height: 3 },
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
   },
   input: {
     width: "100%",
     height: 40,
-    borderColor: "#ccc",
-    borderWidth: 1,
-    borderRadius: 5,
+    alignSelf: "center",
+    borderRadius: 10,
     paddingHorizontal: 10,
-    marginBottom: 15,
-    backgroundColor: "#EAEAEA",
+    marginBottom: 20,
+    backgroundColor: "#f2f2f2",
+    borderColor: "#ccc",
+    borderWidth: 2,
   },
   button: {
-    backgroundColor: "#4285F4",
+    backgroundColor: "#BF0413",
     paddingVertical: 10,
-    borderRadius: 5,
+    borderRadius: 50,
     alignItems: "center",
-    marginBottom: 15,
+    alignSelf: "center",
+    width: "90%",
+    marginTop: 20,
   },
   buttonText: {
-    color: "#fff",
+    color: "#f2f2f2",
+    fontWeight: "700",
     fontSize: 16,
   },
   registerText: {
-    color: "#0000FF",
+    color: "blue",
     textDecorationLine: "underline",
+    padding: 30,
+    alignSelf: "center",
+  },
+  icon: {
+    marginLeft: 10,
   },
 });

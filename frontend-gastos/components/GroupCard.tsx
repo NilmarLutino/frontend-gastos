@@ -33,66 +33,71 @@ export default function GroupCard({
         <Text style={styles.groupTitle}>{groupName}</Text>
         <Text style={styles.date}>{date}</Text>
       </View>
-      <Text style={styles.details}>Integrantes: {members}</Text>
-      <Text style={styles.details}>Gastos totales: {expenses}$</Text>
-      <Text style={styles.details}>Pagados: {paid}</Text>
+      <Text style={styles.details}>Integrantes: <Text style={styles.ammo}>{members}</Text></Text>
+      <Text style={styles.details}>Gastos totales: <Text style={styles.ammo}>{expenses}$</Text></Text>
+      <Text style={styles.details}>Pagados: <Text style={styles.ammo}>{paid}</Text></Text>
       <TouchableOpacity style={styles.detailsButton} onPress={handleDetails}>
         <Text style={styles.detailsButtonText}>Ver detalles</Text>
       </TouchableOpacity>
-      <FontAwesome name="star-o" size={24} color="#000" style={styles.favoriteIcon} />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: "#f9f9f9",
-    padding: 15,
+    backgroundColor: "#f2f2f2",
+    paddingTop: 20,
     marginVertical: 10,
-    borderRadius: 10,
+    borderRadius: 15,
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
+    shadowOffset: { width: 3, height: 3 },
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
     elevation: 2,
     position: "relative",
   },
   cardHeader: {
-    flexDirection: "row",
+    display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 5,
+    paddingBottom: 10,
   },
   groupTitle: {
     fontSize: 16,
     fontWeight: "bold",
-    color: "#333",
+    color: "#262626",
   },
   date: {
     fontSize: 12,
-    color: "#888",
-  },
-  details: {
-    marginTop: 10,
-    marginBottom: 5,
-    fontSize: 14,
     color: "#555",
   },
-  detailsButton: {
-    backgroundColor: "#000",
-    paddingVertical: 8,
-    paddingHorizontal: 15,
-    borderRadius: 5,
-    alignSelf: "flex-start",
+  details: {
+    display: "flex",
+    paddingHorizontal: 30,
+    flexDirection: "row",
+    justifyContent: "space-between",
     marginTop: 10,
+    fontSize: 16,
+    fontWeight: "500",
+    color: "#262626",
+  },
+  ammo: {
+    color: "#262626",
+  },
+  detailsButton: {
+    backgroundColor: "#BF0413",
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    width: "100%",
+    alignSelf: "flex-end",
+    marginTop: 20,
+    borderBottomLeftRadius: 15,
+    borderBottomRightRadius: 15,
   },
   detailsButtonText: {
-    color: "#fff",
-    fontSize: 14,
-  },
-  favoriteIcon: {
-    position: "absolute",
-    top: 10,
-    right: 10,
+    color: "#f2f2f2",
+    fontSize: 16,
+    textAlign: "center",
+    fontWeight: 500,
   },
 });

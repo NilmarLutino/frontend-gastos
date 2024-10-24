@@ -29,7 +29,7 @@ const AddMember: React.FC<AddMemberProps> = ({ visible, onClose, onBuscar }) => 
             <Text style={styles.buttonText}>Buscar</Text>
           </TouchableOpacity>
           <TouchableOpacity
-            style={[styles.button, styles.closeButton]}
+            style={[styles.button, styles.button]}
             onPress={onClose}
           >
             <Text style={styles.buttonText}>Cerrar</Text>
@@ -50,44 +50,51 @@ const styles = StyleSheet.create({
   modalContent: {
     width: 320,
     padding: 20,
-    backgroundColor: "#fff",
+    backgroundColor: "#FDF6F0",  // Fondo claro
     borderRadius: 10,
     alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
   title: {
     fontSize: 18,
     fontWeight: "bold",
     marginBottom: 15,
     textAlign: "center",
+    color: "#262626",
   },
   label: {
     fontSize: 14,
     marginBottom: 5,
+    color: "#262626",
   },
   input: {
     width: "100%",
-    borderColor: "#000",
+    borderColor: "#B0B0B0",  // Borde gris claro
     borderWidth: 1,
     borderRadius: 5,
     padding: 10,
     marginBottom: 15,
     fontSize: 16,
+    backgroundColor: "#fff",
   },
   button: {
     width: "100%",
     padding: 12,
-    backgroundColor: "#000",
+    backgroundColor: "#C1121F",  // Botón rojo
     borderRadius: 5,
     alignItems: "center",
     marginBottom: 10,
   },
   buttonText: {
-    color: "#fff",
+    color: "#fff",  // Texto blanco
     fontSize: 16,
-  },
-  closeButton: {
-    backgroundColor: "#555",
+    fontWeight: "bold",
   },
 });
+
 
 export default AddMember;
