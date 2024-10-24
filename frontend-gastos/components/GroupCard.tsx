@@ -10,6 +10,8 @@ type GroupCardProps = {
   members: number;
   expenses: number;
   paid: number;
+  creadoPor: number;
+  userId: number;
 };
 
 export default function GroupCard({
@@ -19,20 +21,27 @@ export default function GroupCard({
   members,
   expenses,
   paid,
+  creadoPor,
+  userId,
 }: GroupCardProps) {
   const router = useRouter();
 
   const handleDetails = () => {
-    // Navega a la página de detalles del grupo con el groupId
     router.push({ pathname: "/(user)/groupDetailPage", params: { groupId } });
     console.log(groupId);
   };
+
+  // Determinar si el usuario es el propietario o un invitado
+  const userRole = userId === creadoPor ? "Propietario" : "Invitado";
 
   return (
     <View style={styles.card}>
       <View style={styles.cardHeader}>
         <Text style={styles.groupTitle}>{groupName}</Text>
-        <Text style={styles.date}>{date}</Text>
+        <View style={styles.dateContainer}>
+          <Text style={styles.date}>{date}</Text>
+          <Text style={styles.roleText}>{userRole}</Text>
+        </View>
       </View>
       <Text style={styles.details}>Integrantes: {members}</Text>
       <Text style={styles.details}>Gastos totales: {expenses}$</Text>
@@ -67,10 +76,19 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
     color: "#333",
+    flex: 1,
+  },
+  dateContainer: {
+    alignItems: "flex-end",
   },
   date: {
     fontSize: 12,
     color: "#888",
+  },
+  roleText: {
+    fontSize: 12,
+    color: "#555",
+    marginTop: 2,
   },
   details: {
     marginTop: 10,

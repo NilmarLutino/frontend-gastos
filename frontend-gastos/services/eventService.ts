@@ -53,7 +53,7 @@ export const fetchUserEvents = async (userId: number) => {
     }
   };
   
-  export const fetchEventDate = async (eventId: string) => {
+  export const fetchEventDetails = async (eventId: string) => {
     try {
       const response = await fetch(`http://localhost:3000/api/eventos/${eventId}`, {
         method: "GET",
@@ -63,16 +63,20 @@ export const fetchUserEvents = async (userId: number) => {
       });
   
       if (!response.ok) {
-        throw new Error(`Error fetching date for event ID: ${eventId}`);
+        throw new Error(`Error fetching details for event ID: ${eventId}`);
       }
   
       const json = await response.json();
-      return json.result.fecha; // Retorna solo la fecha
+      return {
+        fecha: json.result.fecha,
+        creado_por: json.result.creado_por,
+      }; // Retorna un objeto con la fecha y el creador
     } catch (error) {
-      console.error(`Error fetching date for event ID ${eventId}:`, error);
+      console.error(`Error fetching details for event ID ${eventId}:`, error);
       throw error; // Re-lanza el error para manejarlo donde se use esta función
     }
   };
+  
 
   export const fetchEventSummary = async (groupId: string, userId: number) => {
     try {

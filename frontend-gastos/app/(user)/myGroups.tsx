@@ -5,7 +5,7 @@ import { useUser } from "@clerk/clerk-expo";
 import { useRouter } from "expo-router";
 import BottomNavbar from "../../components/BottomNavbar";
 import GroupCard from "../../components/GroupCard";
-import { fetchUserEvents, fetchEventDate, fetchEventParticipantExpenses, fetchEventParticipants } from "../../services/eventService";
+import { fetchUserEvents, fetchEventDetails, fetchEventParticipantExpenses, fetchEventParticipants } from "../../services/eventService";
 
 type Group = {
   groupId: string;
@@ -14,6 +14,7 @@ type Group = {
   members: number;
   expenses: number;
   paid: number;
+  creadoPor: number;
 };
 
 export default function MyGroups() {
@@ -49,11 +50,12 @@ export default function MyGroups() {
         members: item.cantidad_participantes,
         expenses: 0, // Inicializa en 0, se actualizará con la suma de gastos de los miembros
         paid: 0, // Inicializa en 0, se actualizará con la cantidad de pagos de los miembros
+        creadoPor: 0,
       }));
   
       const groupsWithDatesAndExpenses = await Promise.all(
         mappedGroups.map(async (group): Promise<Group> => {
-          const date = await fetchEventDate(group.groupId);
+          const { fecha, creado_por } = await fetchEventDetails(group.groupId);
   
           // Obtenemos los participantes del evento y calculamos los gastos de cada uno
           const participants = await fetchEventParticipants(group.groupId);
@@ -82,9 +84,10 @@ export default function MyGroups() {
   
           return {
             ...group,
-            date,
+            date: fecha,
+            creadoPor: creado_por, // Actualiza el valor de creado_por
             expenses: totalExpenses,
-            paid: totalPaid, // Actualiza con la cantidad de pagos calculados
+            paid: totalPaid,
           };
         })
       );
@@ -132,6 +135,8 @@ export default function MyGroups() {
             members={item.members}
             expenses={item.expenses}
             paid={item.paid}
+            creadoPor={item.creadoPor} // Pasa el valor de creado_por al componente
+            userId={userId || 0} // Pasa el userId del usuario actual
           />
         )}
         keyExtractor={(item) => item.groupId}

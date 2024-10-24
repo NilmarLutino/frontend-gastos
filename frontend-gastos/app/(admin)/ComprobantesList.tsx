@@ -40,7 +40,7 @@ const ComprobantesList = () => {
       ))}
       <Button
         title="Cerrar"
-        onPress={() => router.push("../(user)/myGroups")}
+        onPress={() => router.back()}
       />
     </View>
   );
