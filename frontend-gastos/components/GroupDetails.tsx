@@ -44,7 +44,7 @@ export default function GroupDetails({ groupData, members, onRefresh, groupId, p
       {userRole === "Propietario" && (
         <TouchableOpacity
           onPress={() => router.push({
-            pathname: "../(admin)/ComprobantesList",
+            pathname: "../(user)/ComprobantesList",
             params: {
               groupId: groupId,
               participanteIds: members.map((member) => member.id).join(","),
@@ -79,7 +79,7 @@ export default function GroupDetails({ groupData, members, onRefresh, groupId, p
           <TouchableOpacity
             onPress={() =>
               router.push({
-                pathname: "../(admin)/ComprobanteDetail",
+                pathname: "../(user)/ComprobanteDetail",
                 params: {
                   eventoId: groupId,
                   participanteId: participanteId,

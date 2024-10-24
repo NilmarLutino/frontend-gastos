@@ -102,7 +102,7 @@ export default function MemberCard({
                 style={styles.button}
                 onPress={() =>
                   router.push({
-                    pathname: "../(admin)/ComprobanteDetail",
+                    pathname: "../(user)/ComprobanteDetail",
                     params: { eventoId: groupId, participanteId: member.id, userRole: "Propietario" },
                     
                   })
