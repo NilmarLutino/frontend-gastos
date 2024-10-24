@@ -6,6 +6,7 @@ import {
   TextInput,
   StyleSheet,
   Alert,
+  Image
 } from "react-native";
 import { useRouter } from "expo-router";
 import { useOAuth, useUser, useSession, useSignIn } from "@clerk/clerk-expo";
@@ -13,6 +14,7 @@ import * as Linking from "expo-linking";
 import axios from "axios";
 import { FontAwesome } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import LogoImage from "../assets/images/gastos.png";
 
 export default function LoginScreen() {
   const router = useRouter();
@@ -120,7 +122,14 @@ export default function LoginScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.formContainer}>
-        <Text style={styles.logoText}>LOGO</Text>
+        <View style={styles.logoContainer}>
+            <Image
+              source={LogoImage} 
+              style={styles.logoImage}
+              resizeMode="contain"
+            />
+            <Text style={styles.logoText}>GASTOS COMPARTIDOS</Text>
+        </View>
         <Text style={styles.labelText}>Correo:</Text>
         <TextInput
           style={styles.input}
@@ -169,13 +178,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#ece2d9",
     justifyContent: "center",
     alignItems: "center",
-  },
-  logoText: {
-    fontSize: 30,
-    fontWeight: "bold",
-    color: "#262626",
-    marginBottom: 20,
-    alignSelf: "center",
   },
   labelText: {
     fontSize: 16,
@@ -227,5 +229,21 @@ const styles = StyleSheet.create({
   },
   icon: {
     marginLeft: 10,
+  },
+  logoContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 20,
+  },
+  logoImage: {
+    width: 100,
+    height: 100,
+    marginRight: 10,
+  },
+  logoText: {
+    fontSize: 30,
+    fontWeight: "bold",
+    color: "#262626",
   },
 });

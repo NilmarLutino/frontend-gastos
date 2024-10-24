@@ -6,11 +6,14 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
+  Image,
 } from "react-native";
 import { FontAwesome } from "@expo/vector-icons";
 import { useSignUp, useOAuth } from "@clerk/clerk-expo";
 import { useRouter } from "expo-router";
 import * as Linking from "expo-linking";
+import LogoImage from "../assets/images/gastos.png";
+
 
 export default function SignUpScreen() {
   const { isLoaded, signUp } = useSignUp();
@@ -50,7 +53,14 @@ export default function SignUpScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.formContainer}>
-        <Text style={styles.logoText}>LOGO</Text>
+        <View style={styles.logoContainer}>
+            <Image
+              source={LogoImage} 
+              style={styles.logoImage}
+              resizeMode="contain"
+            />
+            <Text style={styles.logoText}>GASTOS COMPARTIDOS</Text>
+        </View>
         <TextInput
           style={styles.input}
           autoCapitalize="none"
@@ -92,13 +102,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     padding: 20,
     backgroundColor: "#ece2d9", // Similar al color de fondo de la imagen
-  },
-  logoText: {
-    fontSize: 30,
-    fontWeight: "bold",
-    color: "#262626",
-    marginBottom: 20,
-    alignSelf: "center",
   },
   input: {
     width: "100%",
@@ -145,5 +148,21 @@ const styles = StyleSheet.create({
     marginVertical: 20,
     width: "40%",
     gap: 20,
+  },
+  logoContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 20,
+  },
+  logoImage: {
+    width: 100,
+    height: 100,
+    marginRight: 10,
+  },
+  logoText: {
+    fontSize: 30,
+    fontWeight: "bold",
+    color: "#262626",
   },
 });

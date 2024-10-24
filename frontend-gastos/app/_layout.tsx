@@ -22,9 +22,7 @@ export default function RootLayout() {
   return (
     <ClerkProvider publishableKey={publishableKey}>
       <ClerkLoaded>
-        <Stack>
           <Slot />
-        </Stack>
       </ClerkLoaded>
     </ClerkProvider>
   );

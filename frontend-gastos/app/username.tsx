@@ -1,8 +1,9 @@
 import * as React from 'react';
-import { TextInput, Button, View, StyleSheet, Text, Alert } from 'react-native';
+import { TextInput, Button, View, StyleSheet, Text, Alert, Image } from 'react-native';
 import { useSignUp } from '@clerk/clerk-expo';
 import { useRouter } from 'expo-router';
 import axios from 'axios';
+import LogoImage from "../assets/images/gastos.png";
 
 export default function UsernameScreen() {
   const { isLoaded, signUp, setActive } = useSignUp();
@@ -55,7 +56,14 @@ export default function UsernameScreen() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.logoText}>LOGO</Text>
+        <View style={styles.logoContainer}>
+          <Image
+            source={LogoImage} 
+            style={styles.logoImage}
+            resizeMode="contain"
+          />
+          <Text style={styles.logoText}>GASTOS COMPARTIDOS</Text>
+        </View>
       <TextInput
         style={styles.input}
         value={username}
@@ -89,11 +97,6 @@ const styles = StyleSheet.create({
     padding: 20,
     backgroundColor: '#000',
   },
-  logoText: {
-    fontSize: 24,
-    color: '#fff',
-    marginBottom: 20,
-  },
   input: {
     width: '100%',
     padding: 10,
@@ -102,5 +105,21 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 5,
     backgroundColor: '#EAEAEA',
+  },
+  logoContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 20,
+  },
+  logoImage: {
+    width: 100,
+    height: 100,
+    marginRight: 10,
+  },
+  logoText: {
+    fontSize: 30,
+    fontWeight: "bold",
+    color: "#262626",
   },
 });
