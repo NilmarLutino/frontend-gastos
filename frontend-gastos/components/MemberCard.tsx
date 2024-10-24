@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, FlatList, Button } from "reac
 import { FontAwesome } from "@expo/vector-icons";
 import AddExpenses from "./modals/addExpenses";
 import { createExpense } from "../services/eventService";
+import { useRouter } from "expo-router";
 
 type Expense = {
   item: string;
@@ -20,6 +21,8 @@ type MemberCardProps = {
 };
 
 export default function MemberCard({ member, onRefresh }: MemberCardProps) {
+  const router = useRouter();
+  
   const [isExpanded, setIsExpanded] = useState(false);
   const [isAddExpensesVisible, setAddExpensesVisible] = useState(false); // Estado para el modal
 
@@ -73,7 +76,7 @@ export default function MemberCard({ member, onRefresh }: MemberCardProps) {
             )}
             keyExtractor={(item, index) => index.toString()}
           />
-          <Button title="Comprobantes" onPress={() => console.log("Ver Comprobantes de", member.name)} />
+          <Button title="Comprobantes" onPress={() => router.push("../(admin)/ComprobanteDetail")} />
           <Button title="Agregar Gasto" onPress={() => setAddExpensesVisible(true)} /> {/* Abre el modal */}
         </View>
       )}

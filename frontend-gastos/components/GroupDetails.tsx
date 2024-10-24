@@ -1,6 +1,7 @@
 import React from "react";
 import { View, Text, StyleSheet, Button, FlatList } from "react-native";
 import MemberCard from "./MemberCard";
+import { useRouter } from "expo-router";
 
 type GroupDetailsProps = {
   groupData: {
@@ -21,6 +22,8 @@ type GroupDetailsProps = {
 };
 
 export default function GroupDetails({ groupData, members, onRefresh }: GroupDetailsProps) {
+
+  const router = useRouter();
   return (
     <View style={styles.container}>
       <Text style={styles.groupTitle}>{groupData.groupName}</Text>
@@ -28,7 +31,8 @@ export default function GroupDetails({ groupData, members, onRefresh }: GroupDet
       <Text style={styles.details}>Gastos totales: {groupData.totalExpenses}$</Text>
       <Text style={styles.details}>Pagados: {groupData.paidCount}</Text>
       <Text style={styles.details}>Descripción: {groupData.description}</Text>
-      <Button title="Comprobantes" onPress={() => console.log("Ver Comprobantes")} />
+      <Button title="Comprobantes" onPress={() => router.push("../(admin)/ComprobantesList")} />
+        
 
       <FlatList
         data={members}
