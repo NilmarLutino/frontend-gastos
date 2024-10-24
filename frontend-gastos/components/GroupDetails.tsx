@@ -19,11 +19,12 @@ type GroupDetailsProps = {
     expenses: { item: string; amount: number }[];
   }[];
   onRefresh: () => void; // Añade esta prop
+  groupId: string; // Añade groupId aquí para pasarlo a MemberCard
 };
 
-export default function GroupDetails({ groupData, members, onRefresh }: GroupDetailsProps) {
-
+export default function GroupDetails({ groupData, members, onRefresh, groupId }: GroupDetailsProps) {
   const router = useRouter();
+
   return (
     <View style={styles.container}>
       <Text style={styles.groupTitle}>{groupData.groupName}</Text>
@@ -32,19 +33,21 @@ export default function GroupDetails({ groupData, members, onRefresh }: GroupDet
       <Text style={styles.details}>Pagados: {groupData.paidCount}</Text>
       <Text style={styles.details}>Descripción: {groupData.description}</Text>
       <Button title="Comprobantes" onPress={() => router.push("../(admin)/ComprobantesList")} />
-        
 
       <FlatList
         data={members}
         renderItem={({ item }) => (
-          <MemberCard member={item} onRefresh={onRefresh} /> // Pasa la prop onRefresh a cada MemberCard
+          <MemberCard
+            member={item}
+            groupId={groupId} // Pasa el groupId a cada MemberCard
+            onRefresh={onRefresh}
+          />
         )}
         keyExtractor={(item) => item.id}
       />
     </View>
   );
 }
-
 
 const styles = StyleSheet.create({
   container: {

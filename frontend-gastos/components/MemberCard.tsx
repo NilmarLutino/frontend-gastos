@@ -17,10 +17,11 @@ type MemberCardProps = {
     balance: number;
     expenses: Expense[];
   };
-  onRefresh: () => void; // Asegúrate de definir onRefresh aquí
+  groupId: string; // Asegúrate de recibir groupId aquí
+  onRefresh: () => void;
 };
 
-export default function MemberCard({ member, onRefresh }: MemberCardProps) {
+export default function MemberCard({ member, groupId, onRefresh }: MemberCardProps) {
   const router = useRouter();
   
   const [isExpanded, setIsExpanded] = useState(false);
@@ -76,8 +77,16 @@ export default function MemberCard({ member, onRefresh }: MemberCardProps) {
             )}
             keyExtractor={(item, index) => index.toString()}
           />
-          <Button title="Comprobantes" onPress={() => router.push("../(admin)/ComprobanteDetail")} />
-          <Button title="Agregar Gasto" onPress={() => setAddExpensesVisible(true)} /> {/* Abre el modal */}
+          <Button
+  title="Comprobante"
+  onPress={() =>
+    router.push({
+      pathname: "../(admin)/ComprobanteDetail",
+      params: { eventoId: groupId, participanteId: member.id },
+    })
+  }
+/>
+<Button title="Agregar Gasto" onPress={() => setAddExpensesVisible(true)} /> {/* Abre el modal */}
         </View>
       )}
       

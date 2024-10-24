@@ -143,10 +143,12 @@ export default function GroupDetailPage() {
   return (
     <View style={styles.pageContainer}>
       <GroupDetails
-        groupData={groupData}
-        members={groupData.members}
-        onRefresh={onRefresh}
-      />
+  groupData={groupData}
+  members={groupData.members}
+  onRefresh={onRefresh}
+  groupId={groupId} // Pasar el groupId aquí
+/>
+
       <AddMember
         visible={isAddMemberVisible}
         onClose={() => setAddMemberVisible(false)}
