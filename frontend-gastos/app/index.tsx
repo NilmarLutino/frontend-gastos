@@ -11,6 +11,7 @@ import { useOAuth, useUser, useSession } from "@clerk/clerk-expo";
 import * as Linking from "expo-linking";
 import axios from "axios";
 import { EmailAddressResource } from "@clerk/types";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function LoginScreen() {
   const router = useRouter();
@@ -41,6 +42,16 @@ export default function LoginScreen() {
   };
 
   useEffect(() => {
+
+    const saveUserId = async (id: number) => {
+      try {
+        await AsyncStorage.setItem("userId", id.toString());
+        console.log("User ID saved to storage:", id);
+      } catch (error) {
+        console.error("Failed to save user ID:", error);
+      }
+    };
+    
     const fetchUserFromBackend = async (email: string) => {
       try {
         setLoading(true);
@@ -48,6 +59,8 @@ export default function LoginScreen() {
         console.log("User data from backend:", response.data);
 
         if (response.data) {
+          const userId = response.data.result.id;
+          await saveUserId(userId);
           console.log("User data found:", response.data);
           router.push("/(user)/myGroups");
         } else {

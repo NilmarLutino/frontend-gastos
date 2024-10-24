@@ -25,6 +25,7 @@ export default function GroupCard({
   const handleDetails = () => {
     // Navega a la página de detalles del grupo con el groupId
     router.push({ pathname: "/(user)/groupDetailPage", params: { groupId } });
+    console.log(groupId);
   };
 
   return (
@@ -39,7 +40,6 @@ export default function GroupCard({
       <TouchableOpacity style={styles.detailsButton} onPress={handleDetails}>
         <Text style={styles.detailsButtonText}>Ver detalles</Text>
       </TouchableOpacity>
-      <FontAwesome name="star-o" size={24} color="#000" style={styles.favoriteIcon} />
     </View>
   );
 }

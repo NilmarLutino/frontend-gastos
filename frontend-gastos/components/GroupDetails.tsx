@@ -1,6 +1,6 @@
 import React from "react";
 import { View, Text, StyleSheet, Button, FlatList } from "react-native";
-import MemberCard from "./MemberCard"; // Asegúrate de ajustar la ruta según la estructura
+import MemberCard from "./MemberCard";
 
 type GroupDetailsProps = {
   groupData: {
@@ -17,9 +17,10 @@ type GroupDetailsProps = {
     balance: number;
     expenses: { item: string; amount: number }[];
   }[];
+  onRefresh: () => void; // Añade esta prop
 };
 
-export default function GroupDetails({ groupData, members }: GroupDetailsProps) {
+export default function GroupDetails({ groupData, members, onRefresh }: GroupDetailsProps) {
   return (
     <View style={styles.container}>
       <Text style={styles.groupTitle}>{groupData.groupName}</Text>
@@ -31,12 +32,15 @@ export default function GroupDetails({ groupData, members }: GroupDetailsProps) 
 
       <FlatList
         data={members}
-        renderItem={({ item }) => <MemberCard member={item} />}
+        renderItem={({ item }) => (
+          <MemberCard member={item} onRefresh={onRefresh} /> // Pasa la prop onRefresh a cada MemberCard
+        )}
         keyExtractor={(item) => item.id}
       />
     </View>
   );
 }
+
 
 const styles = StyleSheet.create({
   container: {
