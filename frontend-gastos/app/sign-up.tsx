@@ -113,24 +113,28 @@ const styles = StyleSheet.create({
   button: {
     backgroundColor: "#BF0413", // Botones rojos
     paddingVertical: 10,
+    paddingHorizontal: 20,
     borderRadius: 50, // Bordes redondeados para los botones
     alignItems: "center",
     marginBottom: 15,
-    width: "70%", // Tamaño más grande como en la imagen
+    width: "50%", // Tamaño más grande como en la imagen
   },
   buttonText: {
     color: "#f2f2f2", // Texto blanco
     fontSize: 16,
     fontWeight: "700",
+    textAlign: "center",
   },
   icon: {
     marginLeft: 10,
   },
   formContainer: {
+    display: "flex",
+    justifyContent: "center",
     backgroundColor: "#f2f2f2",
     padding: 20,
     borderRadius: 20,
-    width: "70%",
+    width: "100%",
     shadowColor: "#000",
     shadowOffset: { width: 3, height: 3 },
     shadowOpacity: 0.2,
@@ -143,7 +147,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     marginVertical: 20,
-    width: "40%",
+    width: "90%",
     gap: 20,
   },
 });

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { TextInput, Button, View, StyleSheet, Text, Alert } from 'react-native';
+import { TextInput, Button, View, StyleSheet, Text, Alert, TouchableOpacity } from 'react-native';
 import { useSignUp } from '@clerk/clerk-expo';
 import { useRouter } from 'expo-router';
 import axios from 'axios';
@@ -30,9 +30,9 @@ export default function UsernameScreen() {
 
         const userData = {
           nombre: username,
-          email: completeSignUp.emailAddress, 
+          email: completeSignUp.emailAddress,
           contrasena: password,
-          roles_id: 1, 
+          roles_id: 1,
         };
 
         try {
@@ -55,31 +55,35 @@ export default function UsernameScreen() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.logoText}>LOGO</Text>
-      <TextInput
-        style={styles.input}
-        value={username}
-        placeholder="Username..."
-        onChangeText={(username) => setUsername(username)}
-      />
-      <TextInput
-        style={styles.input}
-        value={password}
-        placeholder="Password..."
-        secureTextEntry={true}
-        onChangeText={(password) => setPassword(password)}
-      />
-      <TextInput
-        style={styles.input}
-        value={confirmPassword}
-        placeholder="Confirm Password..."
-        secureTextEntry={true}
-        onChangeText={(confirmPassword) => setConfirmPassword(confirmPassword)}
-      />
-      <Button title="Complete Sign-Up" onPress={onCompleteSignUp} />
+      <View style={styles.formContainer}>
+        <Text style={styles.logoText}>LOGO</Text>
+        <TextInput
+          style={styles.input}
+          value={username}
+          placeholder="Username..."
+          onChangeText={(username) => setUsername(username)}
+        />
+        <TextInput
+          style={styles.input}
+          value={password}
+          placeholder="Password..."
+          secureTextEntry={true}
+          onChangeText={(password) => setPassword(password)}
+        />
+        <TextInput
+          style={styles.input}
+          value={confirmPassword}
+          placeholder="Confirm Password..."
+          secureTextEntry={true}
+          onChangeText={(confirmPassword) => setConfirmPassword(confirmPassword)}
+        />
+        <TouchableOpacity style={styles.button} onPress={onCompleteSignUp}>
+          <Text style={styles.buttonText}>Complete Sign-Up</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: {
@@ -87,20 +91,46 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
-    backgroundColor: '#000',
+    backgroundColor: '#ece2d9', // Color de fondo consistente con los otros componentes
   },
   logoText: {
-    fontSize: 24,
-    color: '#fff',
+    fontSize: 30,
+    fontWeight: 'bold',
+    color: '#262626',
     marginBottom: 20,
+    alignSelf: 'center',
   },
   input: {
     width: '100%',
     padding: 10,
     marginVertical: 10,
     borderColor: '#ccc',
-    borderWidth: 1,
-    borderRadius: 5,
-    backgroundColor: '#EAEAEA',
+    borderWidth: 2,
+    borderRadius: 10,
+    backgroundColor: '#f2f2f2',
+  },
+  button: {
+    backgroundColor: '#BF0413', // Botón rojo
+    paddingVertical: 10,
+    borderRadius: 50,
+    alignItems: 'center',
+    width: '70%',
+    marginTop: 20,
+  },
+  buttonText: {
+    color: '#f2f2f2', // Texto blanco
+    fontSize: 16,
+    fontWeight: '700',
+  },
+  formContainer: {
+    backgroundColor: '#f2f2f2',
+    padding: 20,
+    borderRadius: 20,
+    width: '70%',
+    shadowColor: '#000',
+    shadowOffset: { width: 3, height: 3 },
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
+    alignItems: 'center',
   },
 });

@@ -108,7 +108,7 @@ export default function MemberCard({
                   })
                 }
               >
-                <Text style={styles.buttonText}>Añadir Comprobantes</Text>
+                <Text style={styles.buttonText}>Ver Comprobante</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={styles.button}
@@ -190,7 +190,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-around",
     alignSelf: "center",
     marginVertical: 20,
-    width: "70%",
+    width: "90%",
     gap: 20,
   },
   button: {
@@ -199,6 +199,9 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 15,
     borderRadius: 5,
+    alignItems: "center",
+    textAlign: "center",
+    width: "60%",
   },
   buttonText: {
     color: "#f2f2f2",
