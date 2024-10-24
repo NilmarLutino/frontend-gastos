@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, StyleSheet, Button, FlatList } from "react-native";
+import { View, Text, StyleSheet, Button, FlatList, TouchableOpacity } from "react-native";
 import MemberCard from "./MemberCard";
 import { useRouter, useLocalSearchParams } from "expo-router";
 
@@ -41,23 +41,22 @@ export default function GroupDetails({ groupData, members, onRefresh, groupId, p
 
       {/* Mostrar botones solo si el usuario es propietario */}
       {userRole === "Propietario" && (
-        <Button
-          title="Comprobantes"
-          onPress={() => router.push("../(admin)/ComprobantesList")}
-        />
+        <TouchableOpacity onPress={() => router.push("../(admin)/ComprobantesList")} style={styles.button}>
+        <Text style={styles.buttonText}>Comprobantes</Text>
+        </TouchableOpacity>
       )}
 
       {/* Mostrar botones solo si el usuario es invitado */}
       {userRole === "Invitado" && (
         <>
-          <Button
-            title="Añadir Comprobante"
-            onPress={() => router.push("../(user)/SubirComprobante")}
-          />
-          <Button
-            title="Ver Comprobante subido"
-            onPress={() => router.push({ pathname: "../(admin)/ComprobanteDetail" })}
-          />
+
+          <TouchableOpacity onPress={() => router.push("../(user)/SubirComprobante")} style={styles.button}>
+          <Text style={styles.buttonText}>Añadir Comprobante</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity onPress={() => router.push({ pathname: "../(admin)/ComprobanteDetail" })} style={styles.button}>
+          <Text style={styles.buttonText}>Ver Comprobante subido</Text>
+          </TouchableOpacity>
         </>
       )}
 
@@ -81,15 +80,47 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: "#f9f9f9",
+    backgroundColor: "#ECE2D9",
   },
   groupTitle: {
-    fontSize: 18,
+    fontSize: 25,
     fontWeight: "bold",
     marginBottom: 10,
+    textAlign: "center",
   },
   details: {
     marginVertical: 5,
-    fontSize: 14,
+    fontSize: 18,
+    fontWeight: "600",
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+  button: {
+    backgroundColor: "#BF0413",
+    padding: 10,
+    borderRadius: 5,
+    marginVertical: 10,
+  },
+  buttonText: {
+    textAlign: "center",
+    color: "#f2f2f2",
+    fontSize: 16,
+    fontWeight: 600,
+  },
+  description: {
+    display: "flex",
+    flexDirection: "column",
+    fontSize: 18,
+    fontWeight: "600",
+    gap: 5,
+  },
+  descriptionContent: {
+    color: "#555",
+    fontWeight: "400",
+    fontSize: 16,
+  },
+  ammo: {
+    color: "#262626",
   },
 });

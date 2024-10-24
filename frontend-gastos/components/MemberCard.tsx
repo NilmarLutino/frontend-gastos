@@ -78,8 +78,8 @@ export default function MemberCard({
       <TouchableOpacity style={styles.header} onPress={toggleExpand}>
         <Text style={styles.memberName}>{member.name}</Text>
         <Text style={styles.balance}>{member.balance}$</Text>
-        <FontAwesome name={isExpanded ? "chevron-up" : "chevron-down"} size={18} color="#000" />
       </TouchableOpacity>
+  
       {isExpanded && (
         <View style={styles.expandedContent}>
           <FlatList
@@ -92,25 +92,41 @@ export default function MemberCard({
             )}
             keyExtractor={(item, index) => index.toString()}
           />
-
+  
           {/* Mostrar botones solo si el usuario es "Propietario" */}
           {userRole === "Propietario" && (
-            <>
-              <Button
-                title="Comprobante"
+            <View style={styles.actions}>
+              <TouchableOpacity
+                style={styles.button}
                 onPress={() =>
                   router.push({
                     pathname: "../(admin)/ComprobanteDetail",
                     params: { eventoId: groupId, participanteId: member.id },
                   })
                 }
-              />
-              <Button title="Agregar Gasto" onPress={() => setAddExpensesVisible(true)} />
-            </>
+              >
+                <Text style={styles.buttonText}>Añadir Comprobantes</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.button}
+                onPress={() => setAddExpensesVisible(true)}
+              >
+                <Text style={styles.buttonText}>Añadir Gasto</Text>
+              </TouchableOpacity>
+            </View>
           )}
         </View>
       )}
-
+  
+      <TouchableOpacity style={styles.deploy} onPress={toggleExpand}>
+        <FontAwesome
+          name={isExpanded ? "chevron-up" : "chevron-down"}
+          size={18}
+          color="#f2f2f2"
+        />
+      </TouchableOpacity>
+  
+      {/* Modal para añadir gastos */}
       <AddExpenses
         visible={isAddExpensesVisible}
         onClose={() => setAddExpensesVisible(false)}
@@ -118,43 +134,82 @@ export default function MemberCard({
       />
     </View>
   );
+  
 }
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: "#fff",
-    marginVertical: 10,
+    backgroundColor: "#f2f2f2",
+    margin: 10,
     borderRadius: 5,
-    padding: 10,
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
+    shadowOffset: { width: 3, height: 3 },
+    shadowOpacity: 0.2,
     shadowRadius: 4,
     elevation: 2,
+    alignItems: "center",
   },
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
-    alignItems: "center",
+    width: "100%",
+    padding: 20,
   },
   memberName: {
-    fontSize: 16,
-    fontWeight: "bold",
+    fontSize: 18,
+    fontWeight: "700",
+    color: "#262626",
   },
   balance: {
-    fontSize: 14,
-    color: "#555",
+    fontSize: 16,
+    color: "#262626",
+    fontWeight: "700",
   },
   expandedContent: {
-    marginTop: 10,
+    marginTop: 20,
+    width: "100%",
   },
   expenseItem: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginVertical: 5,
+    marginTop: 5,
+    paddingHorizontal: 30,
+    width: "100%",
   },
   expenseText: {
-    fontSize: 14,
-    color: "#555",
+    fontSize: 15,
+    color: "#262626",
+  },
+  actions: {
+    display: "flex",
+    flex: 2,
+    flexDirection: "row",
+    justifyContent: "space-around",
+    alignSelf: "center",
+    marginVertical: 20,
+    width: "70%",
+    gap: 20,
+  },
+  button: {
+    flex: 1,
+    backgroundColor: "#BF0413",
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    borderRadius: 5,
+  },
+  buttonText: {
+    color: "#f2f2f2",
+    fontSize: 16,
+    fontWeight: "700",
+    textAlign: "center",
+  },
+  deploy: {
+
+    backgroundColor: "#BF0413",
+    width: "100%",
+    alignItems: "center",
+    paddingVertical: 5,
+    borderBottomLeftRadius: 5,
+    borderBottomRightRadius: 5,
   },
 });

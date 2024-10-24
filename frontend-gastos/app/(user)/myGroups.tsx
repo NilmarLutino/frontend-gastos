@@ -125,7 +125,7 @@ export default function MyGroups() {
       <Text style={styles.welcomeText}>
         Welcome to My Groups, {user?.emailAddresses[0].emailAddress}
       </Text>
-      <FlatList
+      <FlatList style={styles.groupList}
         data={groups}
         renderItem={({ item }) => (
           <GroupCard
@@ -150,9 +150,8 @@ export default function MyGroups() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 10,
     paddingBottom: 60,
-    backgroundColor: "#ffffff",
+    backgroundColor: "#ECE2D9",
   },
   loadingContainer: {
     flex: 1,
@@ -162,9 +161,13 @@ const styles = StyleSheet.create({
   welcomeText: {
     fontSize: 18,
     marginBottom: 20,
+    fontWeight: "600",
     textAlign: "center",
+    color: "#262626",
+    paddingTop: 20,
   },
   groupList: {
-    paddingBottom: 20,
+    paddingLeft: 20,
+    paddingRight: 20,
   },
 });

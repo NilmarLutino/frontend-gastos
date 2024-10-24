@@ -37,10 +37,10 @@ export default function BottomNavbar({
   return (
     <View style={styles.navbar}>
       <TouchableOpacity
-        style={styles.navItem}
+        style={styles.navItemFirst}
         onPress={() => router.push({ pathname: "./UserProfile" })}
       >
-        <FontAwesome name="user" size={24} color="black" />
+        <FontAwesome name="user" size={24} color="#262626" />
         <Text style={styles.navText}>Mi perfil</Text>
       </TouchableOpacity>
 
@@ -48,14 +48,14 @@ export default function BottomNavbar({
         style={styles.navItem}
         onPress={() => router.push({ pathname: actionPath as `./${string}` })}
       >
-        <FontAwesome name="plus-circle" size={24} color="black" />
+        <FontAwesome name="plus-circle" size={24} color="#262626" />
         <Text style={styles.navText}>{actionLabel}</Text>
       </TouchableOpacity>
 
       <TouchableOpacity 
-        style={styles.navItem}
+        style={styles.navItemLast}
         onPress={handleSignOut}>
-        <FontAwesome name="sign-out" size={24} color="black" />
+        <FontAwesome name="sign-out" size={24} color="#262626" />
         <Text style={styles.navText}>Cerrar sesión</Text>
         
       </TouchableOpacity>
@@ -65,10 +65,12 @@ export default function BottomNavbar({
 
 const styles = StyleSheet.create({
   navbar: {
+    display: "flex",
+    flex: 3,
     flexDirection: "row",
     justifyContent: "space-around",
     alignItems: "center",
-    backgroundColor: "#ffffff",
+    backgroundColor: "#f2f2f2",
     paddingVertical: 10,
     borderTopWidth: 1,
     borderTopColor: "#ddd",
@@ -77,10 +79,24 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   navItem: {
+    flex: 1,
+    alignItems: "center",
+    borderColor: "#ddd",
+    borderRightWidth: 2,
+    borderLeftWidth: 2,
+  },
+  navItemFirst: {
+    flex: 1,
+    alignItems: "center",
+  },
+  navItemLast: {
+    flex: 1,
     alignItems: "center",
   },
   navText: {
     fontSize: 12,
+    color: "#262626",
+    fontWeight: 600,
     marginTop: 5,
   },
 });

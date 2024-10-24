@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, Button, Modal, StyleSheet } from "react-native";
+import { View, Text, TextInput, Button, Modal, StyleSheet, TouchableOpacity } from "react-native";
 
 interface AddExpensesProps {
   visible: boolean;
@@ -29,12 +29,18 @@ const AddExpenses: React.FC<AddExpensesProps> = ({ visible, onClose, onAgregar }
             keyboardType="numeric"
             onChangeText={setMonto}
           />
-          <Button title="Añadir" onPress={() => onAgregar(concepto, monto)} />
-          <Button title="Cerrar" onPress={onClose} />
+          <View style={styles.buttonContainer}>
+            <TouchableOpacity style={styles.button} onPress={() => onAgregar(concepto, monto)}>
+              <Text style={styles.buttonText}>Añadir</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.button} onPress={onClose}>
+              <Text style={styles.buttonText}>Cerrar</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
     </Modal>
-  );
+  );  
 };
 
 const styles = StyleSheet.create({
@@ -47,20 +53,50 @@ const styles = StyleSheet.create({
   modalContent: {
     width: 300,
     padding: 20,
-    backgroundColor: "#fff",
+    backgroundColor: "#FDF6F0",  // Fondo claro
     borderRadius: 10,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
   title: {
     fontSize: 18,
     fontWeight: "bold",
     marginBottom: 10,
+    textAlign: "center",
+    color: "#262626",  // Texto oscuro
   },
   input: {
-    borderColor: "#000",
+    borderColor: "#B0B0B0",  // Borde gris claro
     borderWidth: 1,
+    borderRadius: 5,
     marginBottom: 10,
     padding: 8,
+    fontSize: 16,
+    backgroundColor: "#fff",
+  },
+  buttonContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginTop: 20,
+  },
+  button: {
+    backgroundColor: "#C1121F",  // Color rojo intenso para el botón
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 5,
+    alignItems: "center",
+    marginBottom: 10,
+  },
+  buttonText: {
+    color: "#fff",  // Texto blanco
+    fontWeight: "bold",
+    fontSize: 16,
   },
 });
+
+
 
 export default AddExpenses;
