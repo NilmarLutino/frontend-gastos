@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { View, StyleSheet, ActivityIndicator, Alert, Text } from "react-native";
-import { useLocalSearchParams } from "expo-router";
+import { useLocalSearchParams, useFocusEffect  } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import GroupDetails from "../../components/GroupDetails";
 import BottomNavbar from "../../components/BottomNavbarGroupView";
@@ -135,6 +135,14 @@ export default function GroupDetailPage() {
       fetchGroupData();
     }
   }, [userId, groupId]);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      if (userId) {
+        fetchGroupData();
+      }
+    }, [userId, groupId])
+  );
 
   if (loading) {
     return (
