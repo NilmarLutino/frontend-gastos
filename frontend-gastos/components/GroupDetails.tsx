@@ -18,6 +18,9 @@ type GroupDetailsProps = {
     expenses: { item: string; amount: number }[];
   }[];
   onRefresh: () => void; // Añade esta prop
+  groupId: string; // Añade groupId aquí para pasarlo a MemberCard
+  participanteId: string;
+  
 };
 
 export default function GroupDetails({ groupData, members, onRefresh }: GroupDetailsProps) {
@@ -28,7 +31,45 @@ export default function GroupDetails({ groupData, members, onRefresh }: GroupDet
       <Text style={styles.details}>Gastos totales: {groupData.totalExpenses}$</Text>
       <Text style={styles.details}>Pagados: {groupData.paidCount}</Text>
       <Text style={styles.details}>Descripción: {groupData.description}</Text>
-      <Button title="Comprobantes" onPress={() => console.log("Ver Comprobantes")} />
+
+      {/* Mostrar botones solo si el usuario es propietario */}
+      {userRole === "Propietario" && (
+        <Button
+          title="Comprobantes"
+          onPress={() => router.push({
+            pathname: "../(admin)/ComprobantesList",
+            params: {
+              groupId: groupId,
+              participanteIds: members.map((member) => member.id).join(","),
+              participanteNombres: members.map((member) => member.name).join(","),
+            },
+          })}
+        />
+      )}
+
+      {/* Mostrar botones solo si el usuario es invitado */}
+      {userRole === "Invitado" && (
+        <>
+          <Button
+            title="Añadir Comprobante"
+            onPress={() => router.push({
+              pathname: "../(user)/SubirComprobante",
+              params: {
+                eventoId: groupId,
+                participanteId: participanteId,
+              },
+            })}
+          />
+          <Button
+            title="Ver Comprobante subido"
+            onPress={() => router.push({ pathname: "../(admin)/ComprobanteDetail", params: {
+              eventoId: groupId,
+              participanteId: participanteId,
+              userRole: "Invitado",
+            },})}
+          />
+        </>
+      )}
 
       <FlatList
         data={members}

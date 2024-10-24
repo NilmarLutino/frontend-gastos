@@ -21,7 +21,7 @@ type GroupData = {
 };
 
 export default function GroupDetailPage() {
-  const { groupId } = useLocalSearchParams<{ groupId: string }>();
+  const { groupId, userRole } = useLocalSearchParams<{ groupId: string, userRole: string }>();
   const [groupData, setGroupData] = useState<GroupData | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [errorMessage, setErrorMessage] = useState<string>("");
@@ -158,6 +158,7 @@ export default function GroupDetailPage() {
         message={errorMessage}
       />
       <BottomNavbarGroupView
+      userRole={userRole}
   actionLabel="Añadir participante"
   onAction={() => setAddMemberVisible(true)}
   onAddMember={() => setAddMemberVisible(true)} // Asegúrate de pasar esta función.

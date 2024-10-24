@@ -9,12 +9,14 @@ interface BottomNavbarGroupViewProps {
   actionLabel: string;
   onAction: () => void;
   onAddMember?: () => void;
+  userRole: string;
 }
   
   
 
 export default function BottomNavbarGroupView({
   onAddMember,
+  userRole,
 }: BottomNavbarGroupViewProps) {
 
   const { signOut } = useAuth(); // Obtén la función de cierre de sesión
@@ -37,10 +39,13 @@ export default function BottomNavbarGroupView({
         <Text style={styles.navText}>Mis grupos</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.navItem} onPress={() => onAddMember?.()}>
-  <FontAwesome name="user-plus" size={24} color="black" />
-  <Text style={styles.navText}>Añadir participante</Text>
-</TouchableOpacity>
+     {/* Mostrar el botón solo si el userRole es "Propietario" */}
+     {userRole === "Propietario" && (
+        <TouchableOpacity style={styles.navItem} onPress={() => onAddMember?.()}>
+          <FontAwesome name="user-plus" size={24} color="black" />
+          <Text style={styles.navText}>Añadir participante</Text>
+        </TouchableOpacity>
+      )}
 
 
       <TouchableOpacity style={styles.navItem} onPress={handleSignOut}>

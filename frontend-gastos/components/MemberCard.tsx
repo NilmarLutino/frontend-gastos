@@ -73,8 +73,23 @@ export default function MemberCard({ member, onRefresh }: MemberCardProps) {
             )}
             keyExtractor={(item, index) => index.toString()}
           />
-          <Button title="Comprobantes" onPress={() => console.log("Ver Comprobantes de", member.name)} />
-          <Button title="Agregar Gasto" onPress={() => setAddExpensesVisible(true)} /> {/* Abre el modal */}
+
+          {/* Mostrar botones solo si el usuario es "Propietario" */}
+          {userRole === "Propietario" && (
+            <>
+              <Button
+                title="Comprobante"
+                onPress={() =>
+                  router.push({
+                    pathname: "../(admin)/ComprobanteDetail",
+                    params: { eventoId: groupId, participanteId: member.id, userRole: "Propietario" },
+                    
+                  })
+                }
+              />
+              <Button title="Agregar Gasto" onPress={() => setAddExpensesVisible(true)} />
+            </>
+          )}
         </View>
       )}
       
