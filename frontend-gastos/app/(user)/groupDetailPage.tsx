@@ -100,7 +100,7 @@ export default function GroupDetailPage() {
     try {
       const user = await fetchUserByEmail(email);
       if (user) {
-        await addParticipant(groupId, user.id, 1); // Ajusta el roles_id según tu necesidad.
+        await addParticipant(groupId, user.id, 4); // Ajusta el roles_id según tu necesidad.
         setAddMemberVisible(false);
         onRefresh();
         Alert.alert("Éxito", "Participante añadido correctamente");
@@ -143,10 +143,12 @@ export default function GroupDetailPage() {
   return (
     <View style={styles.pageContainer}>
       <GroupDetails
-        groupData={groupData}
-        members={groupData.members}
-        onRefresh={onRefresh}
-      />
+  groupData={groupData}
+  members={groupData.members}
+  onRefresh={onRefresh}
+  groupId={groupId} // Pasar el groupId aquí
+/>
+
       <AddMember
         visible={isAddMemberVisible}
         onClose={() => setAddMemberVisible(false)}
