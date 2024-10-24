@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { TextInput, Button, View, StyleSheet, Text, Alert, Image } from 'react-native';
+import { TextInput, Button, View, StyleSheet, Text, Alert, Image, TouchableOpacity } from 'react-native';
 import { useSignUp } from '@clerk/clerk-expo';
 import { useRouter } from 'expo-router';
 import axios from 'axios';
@@ -31,9 +31,9 @@ export default function UsernameScreen() {
 
         const userData = {
           nombre: username,
-          email: completeSignUp.emailAddress, 
+          email: completeSignUp.emailAddress,
           contrasena: password,
-          roles_id: 1, 
+          roles_id: 1,
         };
 
         try {
@@ -87,7 +87,7 @@ export default function UsernameScreen() {
       <Button title="Complete Sign-Up" onPress={onCompleteSignUp} />
     </View>
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: {
@@ -95,16 +95,40 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
-    backgroundColor: '#000',
+    backgroundColor: '#ece2d9', // Color de fondo consistente con los otros componentes
   },
   input: {
     width: '100%',
     padding: 10,
     marginVertical: 10,
     borderColor: '#ccc',
-    borderWidth: 1,
-    borderRadius: 5,
-    backgroundColor: '#EAEAEA',
+    borderWidth: 2,
+    borderRadius: 10,
+    backgroundColor: '#f2f2f2',
+  },
+  button: {
+    backgroundColor: '#BF0413', // Botón rojo
+    paddingVertical: 10,
+    borderRadius: 50,
+    alignItems: 'center',
+    width: '70%',
+    marginTop: 20,
+  },
+  buttonText: {
+    color: '#f2f2f2', // Texto blanco
+    fontSize: 16,
+    fontWeight: '700',
+  },
+  formContainer: {
+    backgroundColor: '#f2f2f2',
+    padding: 20,
+    borderRadius: 20,
+    width: '70%',
+    shadowColor: '#000',
+    shadowOffset: { width: 3, height: 3 },
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
+    alignItems: 'center',
   },
   logoContainer: {
     flexDirection: "row",

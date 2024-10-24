@@ -85,13 +85,13 @@ export default function UploadImage() {
       )}
 
       <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.button} onPress={pickImage}>
+        <TouchableOpacity style={styles.redButton} onPress={pickImage}>
           <Text style={styles.buttonText}>Seleccionar Imagen</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.button} onPress={uploadImage}>
+        <TouchableOpacity style={styles.redButton} onPress={uploadImage}>
           <Text style={styles.buttonText}>Subir Imagen</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.button} onPress={() => router.back()}>
+        <TouchableOpacity style={styles.redButton} onPress={() => router.back()}>
           <Text style={styles.buttonText}>Cerrar</Text>
         </TouchableOpacity>
       </View>
@@ -104,18 +104,21 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#f5f5f5",
+    backgroundColor: "#ece2d9", // Consistente con las otras pantallas
     padding: 20,
   },
   title: {
     fontSize: 24,
     fontWeight: "bold",
+    color: "#262626", // Color del texto principal
     marginBottom: 20,
   },
   image: {
     width: 200,
     height: 200,
     borderRadius: 10,
+    borderColor: "#BF0413", // Borde rojo para la imagen
+    borderWidth: 2,
     marginBottom: 20,
   },
   placeholderText: {
@@ -124,25 +127,25 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   buttonContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
+    flexDirection: "column", // Alineación vertical de los botones
+    alignItems: "center",
     width: "100%",
-    paddingHorizontal: 20,
     marginTop: 20,
   },
-  button: {
-    backgroundColor: "#4285F4",
+  redButton: {
+    backgroundColor: "#BF0413", // Color de fondo rojo para los botones
     paddingVertical: 12,
-    paddingHorizontal: 8,
-    borderRadius: 5,
+    paddingHorizontal: 30,
+    borderRadius: 10,
+    marginVertical: 8, // Espaciado entre botones
     alignItems: "center",
-    marginHorizontal: 5,
-    flex: 1,
+    width: "80%", // Botones más anchos
   },
   buttonText: {
-    color: "#fff",
+    color: "#f2f2f2", // Texto blanco en los botones
     fontWeight: "bold",
-    fontSize: 14,
+    fontSize: 16,
     textAlign: "center",
   },
 });
+

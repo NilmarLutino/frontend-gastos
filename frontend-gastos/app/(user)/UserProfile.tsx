@@ -107,8 +107,7 @@ export default function UserProfile() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f5f5f5",
-    padding: 20,
+    backgroundColor: "#ece2d9",
     paddingBottom: 60,
   },
   loadingContainer: {
@@ -121,14 +120,16 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     textAlign: "center",
     marginVertical: 20,
+    color: "#262626",
   },
   profileContainer: {
-    backgroundColor: "#fff",
+    backgroundColor: "#f2f2f2",
     borderRadius: 10,
     padding: 20,
+    margin: 20,
     alignItems: "center",
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: { width: 3, height: 3 },
     shadowOpacity: 0.2,
     shadowRadius: 4,
     elevation: 3,
@@ -146,6 +147,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
     marginBottom: 5,
+    color: "#262626",
   },
   infoText: {
     fontSize: 16,
@@ -153,5 +155,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#e9e9e9",
     padding: 10,
     borderRadius: 5,
+    color: "#262626",
   },
 });
