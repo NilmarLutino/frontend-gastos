@@ -42,42 +42,41 @@ export default function GroupCard({
           <Text style={styles.roleText}>{userRole}</Text>
         </View>
       </View>
-      <Text style={styles.details}>Integrantes: {members}</Text>
-      <Text style={styles.details}>Gastos totales: {expenses}$</Text>
-      <Text style={styles.details}>Pagados: {paid}</Text>
+      <Text style={styles.details}>Integrantes: <Text style={styles.ammo}>{members}</Text></Text>
+      <Text style={styles.details}>Gastos totales: <Text style={styles.ammo}>{expenses}$</Text></Text>
+      <Text style={styles.details}>Pagados: <Text style={styles.ammo}>{paid}</Text></Text>
       
 
       <TouchableOpacity style={styles.detailsButton} onPress={handleDetails}>
         <Text style={styles.detailsButtonText}>Ver Detalles</Text>
       </TouchableOpacity>
-
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: "#f9f9f9",
-    padding: 15,
+    backgroundColor: "#f2f2f2",
+    paddingTop: 20,
     marginVertical: 10,
-    borderRadius: 10,
+    borderRadius: 15,
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
+    shadowOffset: { width: 3, height: 3 },
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
     elevation: 2,
     position: "relative",
   },
   cardHeader: {
-    flexDirection: "row",
+    display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 5,
+    paddingBottom: 10,
   },
   groupTitle: {
     fontSize: 16,
     fontWeight: "bold",
-    color: "#333",
+    color: "#262626",
     flex: 1,
   },
   dateContainer: {
@@ -93,22 +92,34 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   details: {
+    display: "flex",
+    paddingHorizontal: 30,
+    flexDirection: "row",
+    justifyContent: "space-between",
     marginTop: 10,
     marginBottom: 5,
-    fontSize: 14,
-    color: "#555",
+    fontSize: 16,
+    fontWeight: "500",
+    color: "#262626",
+  },
+  ammo: {
+    color: "#262626",
   },
   detailsButton: {
-    backgroundColor: "#000",
-    paddingVertical: 8,
+    backgroundColor: "#BF0413",
+    paddingVertical: 10,
     paddingHorizontal: 15,
-    borderRadius: 5,
-    alignSelf: "flex-start",
-    marginTop: 10,
+    width: "100%",
+    alignSelf: "flex-end",
+    marginTop: 20,
+    borderBottomLeftRadius: 15,
+    borderBottomRightRadius: 15,
   },
   detailsButtonText: {
-    color: "#fff",
-    fontSize: 14,
+    color: "#f2f2f2",
+    fontSize: 16,
+    textAlign: "center",
+    fontWeight: 500,
   },
   buttonContainer: {
     flexDirection: "row",

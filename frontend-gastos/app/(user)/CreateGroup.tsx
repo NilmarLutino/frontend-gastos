@@ -90,7 +90,7 @@ export default function CreateGroup() {
 
   return (
     <View style={styles.container}>
-      <View style={styles.innerContainer}>
+      <View style={styles.formContainer}>
         <Text style={styles.title}>CREAR GRUPO</Text>
 
         <TextInput
@@ -118,7 +118,6 @@ export default function CreateGroup() {
           onChangeText={setDescription}
           multiline
         />
-
         <View style={styles.buttonContainer}>
           <TouchableOpacity style={styles.createButton} onPress={handleCreateGroup}>
             <Text style={styles.buttonText}>CREAR</Text>
@@ -177,26 +176,38 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     marginTop: 20,
+    width: "100%",
   },
   createButton: {
-    backgroundColor: "#000",
-    padding: 15,
-    borderRadius: 10,
+    backgroundColor: "#BF0413", // Botón rojo como en los otros componentes
+    paddingVertical: 10,
+    borderRadius: 50, // Bordes redondeados
     alignItems: "center",
     flex: 1,
     marginRight: 10,
   },
   cancelButton: {
-    backgroundColor: "#000",
-    padding: 15,
-    borderRadius: 10,
+    backgroundColor: "#BF0413", // Misma estética para ambos botones
+    paddingVertical: 10,
+    borderRadius: 50, // Bordes redondeados
     alignItems: "center",
     flex: 1,
     marginLeft: 10,
   },
   buttonText: {
-    color: "#fff",
-    fontWeight: "bold",
+    color: "#f2f2f2", // Texto blanco
     fontSize: 16,
+    fontWeight: "700",
+  },
+  formContainer: {
+    backgroundColor: "#f2f2f2",
+    padding: 20,
+    borderRadius: 20,
+    width: "70%",
+    shadowColor: "#000",
+    shadowOffset: { width: 3, height: 3 },
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
+    alignItems: "center",
   },
 });
