@@ -41,24 +41,57 @@ export default function GroupDetails({ groupData, members, onRefresh, groupId, p
 
       {/* Mostrar botones solo si el usuario es propietario */}
       {userRole === "Propietario" && (
-        <TouchableOpacity onPress={() => router.push("../(admin)/ComprobantesList")} style={styles.button}>
-        <Text style={styles.buttonText}>Comprobantes</Text>
+        <TouchableOpacity
+          onPress={() => router.push({
+            pathname: "../(admin)/ComprobantesList",
+            params: {
+              groupId: groupId,
+              participanteIds: members.map((member) => member.id).join(","),
+              participanteNombres: members.map((member) => member.name).join(","),
+            },
+          })}
+          style={styles.button}
+        >
+          <Text style={styles.buttonText}>Comprobantes</Text>
         </TouchableOpacity>
+
       )}
 
-      {/* Mostrar botones solo si el usuario es invitado */}
+      {/* Mostrar botones solo si el usuario es "Invitado" */}
       {userRole === "Invitado" && (
         <>
-
-          <TouchableOpacity onPress={() => router.push("../(user)/SubirComprobante")} style={styles.button}>
-          <Text style={styles.buttonText}>Añadir Comprobante</Text>
+          <TouchableOpacity
+            onPress={() =>
+              router.push({
+                pathname: "../(user)/SubirComprobante",
+                params: {
+                  eventoId: groupId,
+                  participanteId: participanteId,
+                },
+              })
+            }
+            style={styles.button}
+          >
+            <Text style={styles.buttonText}>Añadir Comprobante</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity onPress={() => router.push({ pathname: "../(admin)/ComprobanteDetail" })} style={styles.button}>
-          <Text style={styles.buttonText}>Ver Comprobante subido</Text>
+          <TouchableOpacity
+            onPress={() =>
+              router.push({
+                pathname: "../(admin)/ComprobanteDetail",
+                params: {
+                  eventoId: groupId,
+                  participanteId: participanteId,
+                },
+              })
+            }
+            style={styles.button}
+          >
+            <Text style={styles.buttonText}>Ver Comprobante subido</Text>
           </TouchableOpacity>
         </>
       )}
+
 
       <FlatList
         data={members}
