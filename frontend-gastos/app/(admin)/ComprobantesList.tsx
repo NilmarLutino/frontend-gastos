@@ -4,8 +4,8 @@ import {
   Text,
   Image,
   StyleSheet,
-  Button,
   ActivityIndicator,
+  TouchableOpacity,
 } from "react-native";
 import { useRouter, useLocalSearchParams } from "expo-router";
 
@@ -88,7 +88,9 @@ const ComprobantesList = () => {
           )}
         </View>
       ))}
-      <Button title="Cerrar" onPress={() => router.back()} />
+      <TouchableOpacity style={styles.redButton} onPress={() => router.back()}>
+        <Text style={styles.buttonText}>Cerrar</Text>
+      </TouchableOpacity>
     </View>
   );
 };
@@ -97,21 +99,31 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: "#f5f5f5",
+    backgroundColor: "#ece2d9", // Consistente con los otros componentes
     alignItems: "center",
   },
   title: {
     fontSize: 24,
     fontWeight: "bold",
+    color: "#262626", // Color oscuro para el título
     marginBottom: 20,
   },
   comprobanteContainer: {
     alignItems: "center",
     marginBottom: 20,
+    backgroundColor: "#f2f2f2", // Fondo claro para diferenciar cada comprobante
+    padding: 15,
+    borderRadius: 10,
+    shadowColor: "#000",
+    shadowOpacity: 0.1,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 4,
+    elevation: 5,
   },
   name: {
     fontSize: 16,
     fontWeight: "bold",
+    color: "#262626", // Texto oscuro para el nombre
     marginBottom: 10,
   },
   image: {
@@ -119,6 +131,21 @@ const styles = StyleSheet.create({
     height: 150,
     borderRadius: 10,
     marginBottom: 10,
+    borderColor: "#BF0413", // Borde rojo en la imagen
+    borderWidth: 2,
+  },
+  redButton: {
+    backgroundColor: "#BF0413", // Botón rojo
+    paddingVertical: 10,
+    paddingHorizontal: 30,
+    borderRadius: 50,
+    alignItems: "center",
+    marginTop: 20,
+  },
+  buttonText: {
+    color: "#f2f2f2", // Texto blanco en los botones
+    fontSize: 16,
+    fontWeight: "700",
   },
 });
 
