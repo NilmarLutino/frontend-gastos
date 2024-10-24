@@ -1,16 +1,17 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import {
   View,
   Text,
   TouchableOpacity,
+  TextInput,
   StyleSheet,
   Alert,
 } from "react-native";
 import { useRouter } from "expo-router";
-import { useOAuth, useUser, useSession } from "@clerk/clerk-expo";
+import { useOAuth, useUser, useSession, useSignIn } from "@clerk/clerk-expo";
 import * as Linking from "expo-linking";
 import axios from "axios";
-import { EmailAddressResource } from "@clerk/types";
+import { FontAwesome } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function LoginScreen() {
@@ -18,7 +19,10 @@ export default function LoginScreen() {
   const { startOAuthFlow } = useOAuth({ strategy: "oauth_google" });
   const { user, isSignedIn } = useUser();
   const { session } = useSession();
+  const { signIn, setActive, isLoaded } = useSignIn();
   const [loading, setLoading] = useState(false);
+  const [emailAddress, setEmailAddress] = useState("");
+  const [password, setPassword] = useState("");
 
   const handleLoginWithGoogle = async () => {
     try {
@@ -37,12 +41,33 @@ export default function LoginScreen() {
     }
   };
 
+  const handleSignIn = useCallback(async () => {
+    if (!isLoaded) return;
+
+    try {
+      const signInAttempt = await signIn.create({
+        identifier: emailAddress,
+        password,
+      });
+
+      if (signInAttempt.status === "complete") {
+        await setActive({ session: signInAttempt.createdSessionId });
+        console.log("User signed in successfully.");
+        router.push("/(user)/myGroups");
+      } else {
+        console.error("Sign-in attempt incomplete:", JSON.stringify(signInAttempt, null, 2));
+      }
+    } catch (error) {
+      console.error("Error during sign-in:", JSON.stringify(error, null, 2));
+      Alert.alert("Error", "Failed to sign in. Please check your credentials.");
+    }
+  }, [isLoaded, emailAddress, password]);
+
   const handleSignUp = () => {
     router.push("/sign-up");
   };
 
   useEffect(() => {
-
     const saveUserId = async (id: number) => {
       try {
         await AsyncStorage.setItem("userId", id.toString());
@@ -51,7 +76,7 @@ export default function LoginScreen() {
         console.error("Failed to save user ID:", error);
       }
     };
-    
+
     const fetchUserFromBackend = async (email: string) => {
       try {
         setLoading(true);
@@ -83,7 +108,6 @@ export default function LoginScreen() {
         publicMetadata: user.publicMetadata,
       });
 
-      // Llamada al backend para obtener la información del usuario usando el email
       const email = user.primaryEmailAddress?.emailAddress;
       if (email) {
         fetchUserFromBackend(email);
@@ -95,15 +119,45 @@ export default function LoginScreen() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.logoText}>LOGO</Text>
-      <TouchableOpacity style={styles.button} onPress={handleLoginWithGoogle} disabled={loading}>
-        <Text style={styles.buttonText}>
-          {loading ? "Signing in..." : "Sign in with Google"}
-        </Text>
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.button} onPress={handleSignUp}>
-        <Text style={styles.buttonText}>Sign Up</Text>
-      </TouchableOpacity>
+      <View style={styles.formContainer}>
+        <Text style={styles.logoText}>LOGO</Text>
+        <Text style={styles.labelText}>Correo:</Text>
+        <TextInput
+          style={styles.input}
+          autoCapitalize="none"
+          keyboardType="email-address"
+          placeholder="Ingrese su correo..."
+          placeholderTextColor={"#ccc"}
+          value={emailAddress}
+          onChangeText={setEmailAddress}
+        />
+        <Text style={styles.labelText}>Contraseña:</Text>
+        <TextInput
+          style={styles.input}
+          secureTextEntry
+          autoCapitalize="none"
+          placeholder="Ingrese su contraseña..."
+          placeholderTextColor={"#ccc"}
+          value={password}
+          onChangeText={setPassword}
+        />
+        <TouchableOpacity style={styles.button} onPress={handleSignIn} disabled={loading}>
+          <Text style={styles.buttonText}>
+            {loading ? "Signing in..." : "Iniciar Sesión"}
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.button} onPress={handleLoginWithGoogle} disabled={loading}>
+          <Text style={styles.buttonText}>
+            {loading ? "Signing in..." : "Ingresar con Google"}
+            <FontAwesome style={styles.icon} name="google" size={16} color="#f2f2f2" />
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={handleSignUp}>
+          <Text style={styles.registerText}>
+            No tienes cuenta? Regístrate aquí
+          </Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
@@ -111,24 +165,67 @@ export default function LoginScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#000",
+    gap: 20,
+    backgroundColor: "#ece2d9",
     justifyContent: "center",
     alignItems: "center",
   },
   logoText: {
-    fontSize: 24,
-    color: "#fff",
+    fontSize: 30,
+    fontWeight: "bold",
+    color: "#262626",
     marginBottom: 20,
+    alignSelf: "center",
+  },
+  labelText: {
+    fontSize: 16,
+    color: "#262626",
+    marginBottom: 5,
+    fontWeight: "500",
+    textAlign: "left",
+  },
+  formContainer: {
+    backgroundColor: "#f2f2f2",
+    padding: 20,
+    borderRadius: 20,
+    width: "70%",
+    shadowColor: "#000",
+    shadowOffset: { width: 3, height: 3 },
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
+  },
+  input: {
+    width: "100%",
+    height: 40,
+    alignSelf: "center",
+    borderRadius: 10,
+    paddingHorizontal: 10,
+    marginBottom: 20,
+    backgroundColor: "#f2f2f2",
+    borderColor: "#ccc",
+    borderWidth: 2,
   },
   button: {
-    backgroundColor: "#4285F4",
+    backgroundColor: "#BF0413",
     paddingVertical: 10,
-    borderRadius: 5,
+    borderRadius: 50,
     alignItems: "center",
-    marginBottom: 15,
+    alignSelf: "center",
+    width: "90%",
+    marginTop: 20,
   },
   buttonText: {
-    color: "#fff",
+    color: "#f2f2f2",
+    fontWeight: "700",
     fontSize: 16,
+  },
+  registerText: {
+    color: "blue",
+    textDecorationLine: "underline",
+    padding: 30,
+    alignSelf: "center",
+  },
+  icon: {
+    marginLeft: 10,
   },
 });

@@ -1,8 +1,17 @@
 import React, { useState } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, FlatList, Button } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  FlatList,
+  Button,
+  Alert,
+} from "react-native";
 import { FontAwesome } from "@expo/vector-icons";
 import AddExpenses from "./modals/addExpenses";
-import { createExpense } from "../services/eventService";
+import { createExpense, fetchParticipantById } from "../services/eventService";
+import { useRouter } from "expo-router";
 
 type Expense = {
   item: string;
@@ -16,18 +25,27 @@ type MemberCardProps = {
     balance: number;
     expenses: Expense[];
   };
-  onRefresh: () => void; // Asegúrate de definir onRefresh aquí
+  groupId: string;
+  onRefresh: () => void;
+  userRole: string;
 };
 
-export default function MemberCard({ member, onRefresh }: MemberCardProps) {
+export default function MemberCard({
+  member,
+  groupId,
+  onRefresh,
+  userRole,
+}: MemberCardProps) {
+  const router = useRouter();
   const [isExpanded, setIsExpanded] = useState(false);
-  const [isAddExpensesVisible, setAddExpensesVisible] = useState(false); // Estado para el modal
+  const [isAddExpensesVisible, setAddExpensesVisible] = useState(false);
 
   const toggleExpand = () => {
     setIsExpanded(!isExpanded);
   };
+  //console.log("miembro: ", member.id);
+      
 
-  // Función para manejar la adición de un nuevo gasto
   const handleAgregarGasto = async (concepto: string, monto: string) => {
     try {
       if (!concepto || !monto || isNaN(parseFloat(monto))) {
@@ -35,22 +53,25 @@ export default function MemberCard({ member, onRefresh }: MemberCardProps) {
         return;
       }
 
-      // Llama a la API para crear el nuevo gasto
+      // Obtener el detalle del participante para extraer el usuario_id
+      const participantDetails = await fetchParticipantById(member.id);
+      const usuarioId = participantDetails.usuario_id;
+
+      // Llama a la API para crear el nuevo gasto usando usuarioId
       await createExpense(
-        parseInt(member.id), // ID del miembro (participante)
+        parseInt(groupId),
         parseFloat(monto),
-        "Alimentación", // O ajusta la categoría según corresponda
+        "Alimentación",
         concepto,
-        4 // Reemplaza con el ID del usuario que está agregando el gasto, puedes obtenerlo desde `userId`
+        usuarioId // Usar el usuario_id obtenido
       );
 
-      setAddExpensesVisible(false); // Cierra el modal después de agregar el gasto
-      console.log("Gasto añadido correctamente");
-
-      // Llama a la función de refresco para actualizar los datos del grupo
+      setAddExpensesVisible(false);
       onRefresh();
+      Alert.alert("Éxito", "Gasto añadido correctamente");
     } catch (error) {
       console.error("Error al agregar gasto:", error);
+      Alert.alert("Error", "Hubo un problema al agregar el gasto.");
     }
   };
 
@@ -64,7 +85,7 @@ export default function MemberCard({ member, onRefresh }: MemberCardProps) {
       {isExpanded && (
         <View style={styles.expandedContent}>
           <FlatList
-            data={member.expenses} // Mostrar la lista de gastos desde los datos actualizados
+            data={member.expenses}
             renderItem={({ item }) => (
               <View style={styles.expenseItem}>
                 <Text style={styles.expenseText}>{item.item}</Text>
@@ -92,12 +113,11 @@ export default function MemberCard({ member, onRefresh }: MemberCardProps) {
           )}
         </View>
       )}
-      
-      {/* Modal para añadir gastos */}
+
       <AddExpenses
         visible={isAddExpensesVisible}
-        onClose={() => setAddExpensesVisible(false)} // Cerrar el modal
-        onAgregar={handleAgregarGasto} // Manejar la adición de gastos
+        onClose={() => setAddExpensesVisible(false)}
+        onAgregar={handleAgregarGasto}
       />
     </View>
   );

@@ -28,6 +28,8 @@ export default function GroupDetailPage() {
   const [isAddMemberVisible, setAddMemberVisible] = useState<boolean>(false);
   const [isModalErrorVisible, setModalErrorVisible] = useState<boolean>(false);
   const [userId, setUserId] = useState<number | null>(null);
+  const [participanteId, setParticipanteId] = useState<string | null>(null);
+  
 
   // Función para obtener el userId de AsyncStorage
   const getUserId = async () => {
@@ -52,6 +54,15 @@ export default function GroupDetailPage() {
       const eventSummary = await fetchEventSummary(groupId, userId);
       const participants = await fetchEventParticipants(groupId);
 
+
+      const participant = participants.find((p: any) => p.usuario_id === userId);
+      if (participant) {
+        setParticipanteId(participant.participante_id.toString());
+        
+      }
+      
+      
+      
       const members = await Promise.all(
         participants.map(async (participant: any) => {
           const expenses = await fetchEventParticipantExpenses(participant.participante_id, groupId);
@@ -82,6 +93,7 @@ export default function GroupDetailPage() {
       };
 
       setGroupData(mappedData);
+      console.log("miembros: ", members);
     } catch (error) {
       console.error("Error fetching group summary:", error);
       setErrorMessage("Error al obtener los detalles del evento.");
@@ -100,7 +112,7 @@ export default function GroupDetailPage() {
     try {
       const user = await fetchUserByEmail(email);
       if (user) {
-        await addParticipant(groupId, user.id, 1); // Ajusta el roles_id según tu necesidad.
+        await addParticipant(groupId, user.id, 4); // Ajusta el roles_id según tu necesidad.
         setAddMemberVisible(false);
         onRefresh();
         Alert.alert("Éxito", "Participante añadido correctamente");
@@ -139,14 +151,17 @@ export default function GroupDetailPage() {
       </View>
     );
   }
-
+  console.log("Participante a pagar:", participanteId);
   return (
     <View style={styles.pageContainer}>
       <GroupDetails
-        groupData={groupData}
-        members={groupData.members}
-        onRefresh={onRefresh}
-      />
+  groupData={groupData}
+  members={groupData.members}
+  onRefresh={onRefresh}
+  groupId={groupId} // Pasar el groupId aquí
+  participanteId={participanteId || ""} // Asegúrate de convertirlo a string
+/>
+
       <AddMember
         visible={isAddMemberVisible}
         onClose={() => setAddMemberVisible(false)}
