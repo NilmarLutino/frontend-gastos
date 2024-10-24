@@ -229,4 +229,24 @@ export const fetchUserEvents = async (userId: number) => {
     }
   };
   
+  export const fetchParticipantById = async (participantId: string) => {
+    try {
+      const response = await fetch(`http://localhost:3000/api/participantes/${participantId}`, {
+        method: "GET",
+        headers: {
+          Accept: "application/json",
+        },
+      });
+  
+      if (!response.ok) {
+        throw new Error(`Error fetching participant with ID: ${participantId}`);
+      }
+  
+      const json = await response.json();
+      return json.result;
+    } catch (error) {
+      console.error(`Error fetching participant with ID ${participantId}:`, error);
+      throw error;
+    }
+  };
   

@@ -1,8 +1,16 @@
 import React, { useState } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, FlatList, Button } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  FlatList,
+  Button,
+  Alert,
+} from "react-native";
 import { FontAwesome } from "@expo/vector-icons";
 import AddExpenses from "./modals/addExpenses";
-import { createExpense } from "../services/eventService";
+import { createExpense, fetchParticipantById } from "../services/eventService";
 import { useRouter } from "expo-router";
 
 type Expense = {
@@ -19,7 +27,7 @@ type MemberCardProps = {
   };
   groupId: string;
   onRefresh: () => void;
-  userRole: string; // Añadido para determinar si es propietario o invitado
+  userRole: string;
 };
 
 export default function MemberCard({
@@ -29,7 +37,6 @@ export default function MemberCard({
   userRole,
 }: MemberCardProps) {
   const router = useRouter();
-  
   const [isExpanded, setIsExpanded] = useState(false);
   const [isAddExpensesVisible, setAddExpensesVisible] = useState(false);
 
@@ -44,18 +51,25 @@ export default function MemberCard({
         return;
       }
 
+      // Obtener el detalle del participante para extraer el usuario_id
+      const participantDetails = await fetchParticipantById(member.id);
+      const usuarioId = participantDetails.usuario_id;
+
+      // Llama a la API para crear el nuevo gasto usando usuarioId
       await createExpense(
-        parseInt(member.id),
+        parseInt(groupId),
         parseFloat(monto),
         "Alimentación",
         concepto,
-        4
+        usuarioId // Usar el usuario_id obtenido
       );
 
       setAddExpensesVisible(false);
       onRefresh();
+      Alert.alert("Éxito", "Gasto añadido correctamente");
     } catch (error) {
       console.error("Error al agregar gasto:", error);
+      Alert.alert("Error", "Hubo un problema al agregar el gasto.");
     }
   };
 
@@ -96,7 +110,7 @@ export default function MemberCard({
           )}
         </View>
       )}
-      
+
       <AddExpenses
         visible={isAddExpensesVisible}
         onClose={() => setAddExpensesVisible(false)}
