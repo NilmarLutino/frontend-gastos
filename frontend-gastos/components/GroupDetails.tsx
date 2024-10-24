@@ -22,9 +22,10 @@ type GroupDetailsProps = {
   }[];
   onRefresh: () => void; // Añade esta prop
   groupId: string; // Añade groupId aquí para pasarlo a MemberCard
+  participanteId: string;
 };
 
-export default function GroupDetails({ groupData, members, onRefresh, groupId }: GroupDetailsProps) {
+export default function GroupDetails({ groupData, members, onRefresh, groupId, participanteId  }: GroupDetailsProps) {
   const router = useRouter();
   const { userRole } = useLocalSearchParams<{ userRole: string }>(); // Recibe el userRole de los parámetros
 
@@ -58,6 +59,18 @@ export default function GroupDetails({ groupData, members, onRefresh, groupId }:
         </>
       )}
 
+      <Button
+        title="Añadir Comprobante"
+        onPress={() =>
+          router.push({
+            pathname: "../(user)/SubirComprobante",
+            params: {
+              eventoId: groupId,
+              participanteId: participanteId?.toString(),
+            },
+          })
+        }
+      />
       <FlatList
         data={members}
         renderItem={({ item }) => (
