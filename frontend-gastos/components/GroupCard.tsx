@@ -27,11 +27,10 @@ export default function GroupCard({
   const router = useRouter();
 
   const handleDetails = () => {
-    router.push({ pathname: "/(user)/groupDetailPage", params: { groupId } });
-    console.log(groupId);
+    router.push({ pathname: "/(user)/groupDetailPage", params: { groupId, userRole } });
+    console.log(groupId, userRole);
   };
 
-  // Determinar si el usuario es el propietario o un invitado
   const userRole = userId === creadoPor ? "Propietario" : "Invitado";
 
   return (
@@ -46,9 +45,12 @@ export default function GroupCard({
       <Text style={styles.details}>Integrantes: {members}</Text>
       <Text style={styles.details}>Gastos totales: {expenses}$</Text>
       <Text style={styles.details}>Pagados: {paid}</Text>
+      
+
       <TouchableOpacity style={styles.detailsButton} onPress={handleDetails}>
-        <Text style={styles.detailsButtonText}>Ver detalles</Text>
+        <Text style={styles.detailsButtonText}>Ver Detalles</Text>
       </TouchableOpacity>
+
     </View>
   );
 }
@@ -108,9 +110,9 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 14,
   },
-  favoriteIcon: {
-    position: "absolute",
-    top: 10,
-    right: 10,
+  buttonContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginTop: 10,
   },
 });

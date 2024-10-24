@@ -1,7 +1,8 @@
 import React from "react";
 import { View, Text, StyleSheet, Button, FlatList } from "react-native";
 import MemberCard from "./MemberCard";
-import { useRouter } from "expo-router";
+import { useRouter, useLocalSearchParams } from "expo-router";
+
 
 type GroupDetailsProps = {
   groupData: {
@@ -11,6 +12,7 @@ type GroupDetailsProps = {
     totalExpenses: number;
     paidCount: number;
     description: string;
+    
   };
   members: {
     id: string;
@@ -24,6 +26,7 @@ type GroupDetailsProps = {
 
 export default function GroupDetails({ groupData, members, onRefresh, groupId }: GroupDetailsProps) {
   const router = useRouter();
+  const { userRole } = useLocalSearchParams<{ userRole: string }>(); // Recibe el userRole de los parámetros
 
   return (
     <View style={styles.container}>
@@ -32,7 +35,28 @@ export default function GroupDetails({ groupData, members, onRefresh, groupId }:
       <Text style={styles.details}>Gastos totales: {groupData.totalExpenses}$</Text>
       <Text style={styles.details}>Pagados: {groupData.paidCount}</Text>
       <Text style={styles.details}>Descripción: {groupData.description}</Text>
-      <Button title="Comprobantes" onPress={() => router.push("../(admin)/ComprobantesList")} />
+
+      {/* Mostrar botones solo si el usuario es propietario */}
+      {userRole === "Propietario" && (
+        <Button
+          title="Comprobantes"
+          onPress={() => router.push("../(admin)/ComprobantesList")}
+        />
+      )}
+
+      {/* Mostrar botones solo si el usuario es invitado */}
+      {userRole === "Invitado" && (
+        <>
+          <Button
+            title="Añadir"
+            onPress={() => router.push("../(user)/SubirComprobante")}
+          />
+          <Button
+            title="Ver Comprobante subido"
+            onPress={() => router.push({ pathname: "../(admin)/ComprobanteDetail" })}
+          />
+        </>
+      )}
 
       <FlatList
         data={members}
@@ -41,6 +65,7 @@ export default function GroupDetails({ groupData, members, onRefresh, groupId }:
             member={item}
             groupId={groupId} // Pasa el groupId a cada MemberCard
             onRefresh={onRefresh}
+            userRole={userRole}
           />
         )}
         keyExtractor={(item) => item.id}

@@ -17,21 +17,26 @@ type MemberCardProps = {
     balance: number;
     expenses: Expense[];
   };
-  groupId: string; // Asegúrate de recibir groupId aquí
+  groupId: string;
   onRefresh: () => void;
+  userRole: string; // Añadido para determinar si es propietario o invitado
 };
 
-export default function MemberCard({ member, groupId, onRefresh }: MemberCardProps) {
+export default function MemberCard({
+  member,
+  groupId,
+  onRefresh,
+  userRole,
+}: MemberCardProps) {
   const router = useRouter();
   
   const [isExpanded, setIsExpanded] = useState(false);
-  const [isAddExpensesVisible, setAddExpensesVisible] = useState(false); // Estado para el modal
+  const [isAddExpensesVisible, setAddExpensesVisible] = useState(false);
 
   const toggleExpand = () => {
     setIsExpanded(!isExpanded);
   };
 
-  // Función para manejar la adición de un nuevo gasto
   const handleAgregarGasto = async (concepto: string, monto: string) => {
     try {
       if (!concepto || !monto || isNaN(parseFloat(monto))) {
@@ -39,19 +44,15 @@ export default function MemberCard({ member, groupId, onRefresh }: MemberCardPro
         return;
       }
 
-      // Llama a la API para crear el nuevo gasto
       await createExpense(
-        parseInt(member.id), // ID del miembro (participante)
+        parseInt(member.id),
         parseFloat(monto),
-        "Alimentación", // O ajusta la categoría según corresponda
+        "Alimentación",
         concepto,
-        4 // Reemplaza con el ID del usuario que está agregando el gasto, puedes obtenerlo desde `userId`
+        4
       );
 
-      setAddExpensesVisible(false); // Cierra el modal después de agregar el gasto
-      console.log("Gasto añadido correctamente");
-
-      // Llama a la función de refresco para actualizar los datos del grupo
+      setAddExpensesVisible(false);
       onRefresh();
     } catch (error) {
       console.error("Error al agregar gasto:", error);
@@ -68,7 +69,7 @@ export default function MemberCard({ member, groupId, onRefresh }: MemberCardPro
       {isExpanded && (
         <View style={styles.expandedContent}>
           <FlatList
-            data={member.expenses} // Mostrar la lista de gastos desde los datos actualizados
+            data={member.expenses}
             renderItem={({ item }) => (
               <View style={styles.expenseItem}>
                 <Text style={styles.expenseText}>{item.item}</Text>
@@ -77,24 +78,29 @@ export default function MemberCard({ member, groupId, onRefresh }: MemberCardPro
             )}
             keyExtractor={(item, index) => index.toString()}
           />
-          <Button
-  title="Comprobante"
-  onPress={() =>
-    router.push({
-      pathname: "../(admin)/ComprobanteDetail",
-      params: { eventoId: groupId, participanteId: member.id },
-    })
-  }
-/>
-<Button title="Agregar Gasto" onPress={() => setAddExpensesVisible(true)} /> {/* Abre el modal */}
+
+          {/* Mostrar botones solo si el usuario es "Propietario" */}
+          {userRole === "Propietario" && (
+            <>
+              <Button
+                title="Comprobante"
+                onPress={() =>
+                  router.push({
+                    pathname: "../(admin)/ComprobanteDetail",
+                    params: { eventoId: groupId, participanteId: member.id },
+                  })
+                }
+              />
+              <Button title="Agregar Gasto" onPress={() => setAddExpensesVisible(true)} />
+            </>
+          )}
         </View>
       )}
       
-      {/* Modal para añadir gastos */}
       <AddExpenses
         visible={isAddExpensesVisible}
-        onClose={() => setAddExpensesVisible(false)} // Cerrar el modal
-        onAgregar={handleAgregarGasto} // Manejar la adición de gastos
+        onClose={() => setAddExpensesVisible(false)}
+        onAgregar={handleAgregarGasto}
       />
     </View>
   );
