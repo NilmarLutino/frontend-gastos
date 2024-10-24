@@ -4,34 +4,28 @@ import { View, Text, TextInput, Button, Modal, StyleSheet, TouchableOpacity } fr
 interface AddMemberProps {
   visible: boolean;
   onClose: () => void;
-  onBuscar: (username: string) => void;
+  onBuscar: (email: string) => void;
 }
 
 const AddMember: React.FC<AddMemberProps> = ({ visible, onClose, onBuscar }) => {
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
 
   return (
     <Modal visible={visible} animationType="slide" transparent={true}>
       <View style={styles.modalContainer}>
         <View style={styles.modalContent}>
           <Text style={styles.title}>AGREGAR PARTICIPANTE</Text>
-          <Text style={styles.label}>NOMBRE DE USUARIO</Text>
+          <Text style={styles.label}>EMAIL DEL USUARIO</Text>
           <TextInput
             style={styles.input}
-            value={username}
-            onChangeText={setUsername}
-            placeholder="JuanPerez123"
+            value={email}
+            onChangeText={setEmail}
+            placeholder="correo@example.com"
           />
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => onBuscar(username)}
-          >
+          <TouchableOpacity style={styles.button} onPress={() => onBuscar(email)}>
             <Text style={styles.buttonText}>Buscar</Text>
           </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.button, styles.closeButton]}
-            onPress={onClose}
-          >
+          <TouchableOpacity style={[styles.button, styles.closeButton]} onPress={onClose}>
             <Text style={styles.buttonText}>Cerrar</Text>
           </TouchableOpacity>
         </View>

@@ -25,6 +25,7 @@ export default function GroupCard({
   const handleDetails = () => {
     // Navega a la página de detalles del grupo con el groupId
     router.push({ pathname: "/(user)/groupDetailPage", params: { groupId } });
+    console.log(groupId);
   };
 
   return (
