@@ -29,6 +29,8 @@ export default function GroupDetails({ groupData, members, onRefresh, groupId, p
   const router = useRouter();
   const { userRole } = useLocalSearchParams<{ userRole: string }>(); // Recibe el userRole de los parámetros
 
+  console.log("Vista de GroupDetails, USER ROLES:", userRole );
+
   return (
     <View style={styles.container}>
       <Text style={styles.groupTitle}>{groupData.groupName}</Text>
@@ -49,7 +51,7 @@ export default function GroupDetails({ groupData, members, onRefresh, groupId, p
       {userRole === "Invitado" && (
         <>
           <Button
-            title="Añadir"
+            title="Añadir Comprobante"
             onPress={() => router.push("../(user)/SubirComprobante")}
           />
           <Button
@@ -59,18 +61,6 @@ export default function GroupDetails({ groupData, members, onRefresh, groupId, p
         </>
       )}
 
-      <Button
-        title="Añadir Comprobante"
-        onPress={() =>
-          router.push({
-            pathname: "../(user)/SubirComprobante",
-            params: {
-              eventoId: groupId,
-              participanteId: participanteId?.toString(),
-            },
-          })
-        }
-      />
       <FlatList
         data={members}
         renderItem={({ item }) => (

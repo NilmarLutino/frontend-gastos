@@ -78,7 +78,7 @@ const ComprobanteDetail = () => {
         />
         <Button
           title="Cerrar"
-          onPress={() => router.push("../(user)/myGroups")} // Vuelve a la página anterior
+          onPress={() => router.back()}// Vuelve a la página anterior
         />
       </View>
     </View>
