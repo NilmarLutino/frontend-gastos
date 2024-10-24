@@ -1,47 +1,94 @@
-// File: ComprobantesList.tsx
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
   Image,
   StyleSheet,
   Button,
-  TouchableOpacity,
+  ActivityIndicator,
 } from "react-native";
-import { useRouter } from "expo-router";
+import { useRouter, useLocalSearchParams } from "expo-router";
 
 const ComprobantesList = () => {
   const router = useRouter();
+  const { groupId, participanteIds, participanteNombres } = useLocalSearchParams<{
+    groupId: string;
+    participanteIds: string;
+    participanteNombres: string;
+  }>();
+  const [comprobantes, setComprobantes] = useState<any[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
 
-  const comprobantes = [
-    {
-      id: "1",
-      name: "Integrante 1",
-      imageUrl: "https://via.placeholder.com/150", // Reemplaza con la URL de la imagen real
-    },
-    {
-      id: "2",
-      name: "Integrante 2",
-      imageUrl: "https://via.placeholder.com/150", // Reemplaza con la URL de la imagen real
-    },
-  ];
+  useEffect(() => {
+    const fetchComprobantes = async () => {
+      try {
+        if (!participanteIds || !groupId || !participanteNombres) {
+          console.error("Faltan participanteIds, groupId, o participanteNombres");
+          return;
+        }
+
+        const ids = participanteIds.split(","); // Suponiendo que `participanteIds` se pasa como una lista separada por comas
+        const nombres = participanteNombres.split(","); // Suponiendo que `participanteNombres` se pasa como una lista separada por comas
+
+        // Emparejamos cada id con su respectivo nombre
+        const comprobantesPromises = ids.map(async (id, index) => {
+          try {
+            const response = await fetch(
+              `http://localhost:3000/api/pagos/evento/${groupId}/participante/${id}`
+            );
+            const data = await response.json();
+            return {
+              participanteId: id,
+              nombre: nombres[index] || "Desconocido", // Tomar el nombre correspondiente
+              files: data.result[0]?.files || [],
+            };
+          } catch (error) {
+            console.error(`Error fetching comprobantes for participanteId ${id}:`, error);
+            return null;
+          }
+        });
+
+        const results = await Promise.all(comprobantesPromises);
+        const filteredResults = results.filter((result) => result !== null);
+        setComprobantes(filteredResults);
+      } catch (error) {
+        console.error("Error fetching comprobantes:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchComprobantes();
+  }, [groupId, participanteIds, participanteNombres]);
+
+  if (loading) {
+    return (
+      <View style={styles.container}>
+        <ActivityIndicator size="large" color="#0000ff" />
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>COMPROBANTES</Text>
       {comprobantes.map((comprobante) => (
-        <View key={comprobante.id} style={styles.comprobanteContainer}>
-          <Text style={styles.name}>{comprobante.name}</Text>
-          <Image
-            source={{ uri: comprobante.imageUrl }}
-            style={styles.image}
-          />
+        <View key={comprobante.participanteId} style={styles.comprobanteContainer}>
+          <Text style={styles.name}>{comprobante.nombre}</Text>
+          {comprobante.files.length > 0 ? (
+            comprobante.files.map((fileUrl: string, index: number) => (
+              <Image
+                key={index}
+                source={{ uri: fileUrl }}
+                style={styles.image}
+              />
+            ))
+          ) : (
+            <Text>No hay imagen disponible</Text>
+          )}
         </View>
       ))}
-      <Button
-        title="Cerrar"
-        onPress={() => router.back()}
-      />
+      <Button title="Cerrar" onPress={() => router.back()} />
     </View>
   );
 };

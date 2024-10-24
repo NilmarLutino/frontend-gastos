@@ -43,7 +43,14 @@ export default function GroupDetails({ groupData, members, onRefresh, groupId, p
       {userRole === "Propietario" && (
         <Button
           title="Comprobantes"
-          onPress={() => router.push("../(admin)/ComprobantesList")}
+          onPress={() => router.push({
+            pathname: "../(admin)/ComprobantesList",
+            params: {
+              groupId: groupId,
+              participanteIds: members.map((member) => member.id).join(","),
+              participanteNombres: members.map((member) => member.name).join(","),
+            },
+          })}
         />
       )}
 
@@ -52,11 +59,20 @@ export default function GroupDetails({ groupData, members, onRefresh, groupId, p
         <>
           <Button
             title="Añadir Comprobante"
-            onPress={() => router.push("../(user)/SubirComprobante")}
+            onPress={() => router.push({
+              pathname: "../(user)/SubirComprobante",
+              params: {
+                eventoId: groupId,
+                participanteId: participanteId,
+              },
+            })}
           />
           <Button
             title="Ver Comprobante subido"
-            onPress={() => router.push({ pathname: "../(admin)/ComprobanteDetail" })}
+            onPress={() => router.push({ pathname: "../(admin)/ComprobanteDetail", params: {
+              eventoId: groupId,
+              participanteId: participanteId,
+            },})}
           />
         </>
       )}

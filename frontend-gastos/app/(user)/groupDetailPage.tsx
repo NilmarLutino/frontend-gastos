@@ -28,7 +28,8 @@ export default function GroupDetailPage() {
   const [isAddMemberVisible, setAddMemberVisible] = useState<boolean>(false);
   const [isModalErrorVisible, setModalErrorVisible] = useState<boolean>(false);
   const [userId, setUserId] = useState<number | null>(null);
-  let participanteId="";
+  const [participanteId, setParticipanteId] = useState<string | null>(null);
+  
 
   // Función para obtener el userId de AsyncStorage
   const getUserId = async () => {
@@ -56,10 +57,12 @@ export default function GroupDetailPage() {
 
       const participant = participants.find((p: any) => p.usuario_id === userId);
       if (participant) {
-        participanteId=participant.participante_id;
+        setParticipanteId(participant.participante_id.toString());
+        
       }
       
-      console.log("Participante a pagar:", participanteId);
+      
+      
       const members = await Promise.all(
         participants.map(async (participant: any) => {
           const expenses = await fetchEventParticipantExpenses(participant.participante_id, groupId);
@@ -90,6 +93,7 @@ export default function GroupDetailPage() {
       };
 
       setGroupData(mappedData);
+      console.log("miembros: ", members);
     } catch (error) {
       console.error("Error fetching group summary:", error);
       setErrorMessage("Error al obtener los detalles del evento.");
@@ -147,7 +151,7 @@ export default function GroupDetailPage() {
       </View>
     );
   }
-
+  console.log("Participante a pagar:", participanteId);
   return (
     <View style={styles.pageContainer}>
       <GroupDetails
@@ -155,7 +159,7 @@ export default function GroupDetailPage() {
   members={groupData.members}
   onRefresh={onRefresh}
   groupId={groupId} // Pasar el groupId aquí
-  participanteId={participanteId} // Asegúrate de convertirlo a string
+  participanteId={participanteId || ""} // Asegúrate de convertirlo a string
 />
 
       <AddMember

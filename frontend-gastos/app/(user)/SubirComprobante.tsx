@@ -9,33 +9,35 @@ import {
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import { useRouter, useLocalSearchParams } from "expo-router";
-import axios from "axios";
 
 export default function UploadImage() {
   const [imageUri, setImageUri] = useState<string | null>(null);
   const router = useRouter();
   const { eventoId, participanteId } = useLocalSearchParams();
 
-  // Función para seleccionar una imagen desde la galería
   const pickImage = async () => {
-    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (status !== "granted") {
-      Alert.alert("Permiso denegado", "Se requiere acceso a la galería.");
-      return;
-    }
+    try {
+      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (status !== "granted") {
+        Alert.alert("Permiso denegado", "Se requiere acceso a la galería.");
+        return;
+      }
 
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      quality: 1,
-    });
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        quality: 1,
+      });
 
-    if (!result.canceled) {
-      setImageUri(result.assets[0].uri);
+      if (!result.canceled) {
+        setImageUri(result.assets[0].uri);
+      }
+    } catch (error) {
+      console.error("Error al seleccionar la imagen:", error);
+      Alert.alert("Error", "No se pudo acceder a la galería.");
     }
   };
 
-  // Función para subir la imagen al servidor
   const uploadImage = async () => {
     if (!imageUri || !eventoId || !participanteId) {
       Alert.alert("Error", "Por favor, selecciona una imagen y asegúrate de que los datos sean válidos.");
@@ -43,29 +45,26 @@ export default function UploadImage() {
     }
 
     try {
-      // Crear un FormData para enviar la imagen
+      const response = await fetch(imageUri);
+      const blob = await response.blob();
       const formData = new FormData();
+
+      formData.append("files", blob, "image.jpg");
       formData.append("evento_id", eventoId.toString());
       formData.append("participante_id", participanteId.toString());
       formData.append("monto", "0");
       formData.append("fecha_pago", new Date().toISOString().split("T")[0]);
-      formData.append("files", {
-        uri: imageUri,
-        name: imageUri.split("/").pop(), // Nombre del archivo
-        type: "image/jpeg", // Ajusta esto según el tipo de archivo
+
+      const uploadResponse = await fetch("http://localhost:3000/api/pagos", {
+        method: "POST",
+        body: formData,
       });
 
-      // Realizar la solicitud al backend
-      const response = await axios.post("http://localhost:3000/api/pagos", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
+      const data = await uploadResponse.json();
+      console.log("Respuesta del servidor:", data);
 
-      // Verificar la respuesta y mostrar una alerta
-      if (response.data && response.data.result) {
-        Alert.alert("Éxito", "Imagen subida y URL almacenada correctamente.");
-        console.log("Respuesta del servidor:", response.data);
+      if (data.result && data.result.url_comprobante) {
+        Alert.alert("Éxito", `Imagen subida y URL almacenada: ${data.result.url_comprobante[0]}`);
         router.back();
       } else {
         throw new Error("La respuesta del servidor no contiene una URL válida.");

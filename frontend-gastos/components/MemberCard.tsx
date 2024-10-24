@@ -43,6 +43,8 @@ export default function MemberCard({
   const toggleExpand = () => {
     setIsExpanded(!isExpanded);
   };
+  //console.log("miembro: ", member.id);
+      
 
   const handleAgregarGasto = async (concepto: string, monto: string) => {
     try {
