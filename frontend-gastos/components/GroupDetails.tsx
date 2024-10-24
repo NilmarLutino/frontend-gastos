@@ -20,9 +20,10 @@ type GroupDetailsProps = {
   }[];
   onRefresh: () => void; // Añade esta prop
   groupId: string; // Añade groupId aquí para pasarlo a MemberCard
+  participanteId: string;
 };
 
-export default function GroupDetails({ groupData, members, onRefresh, groupId }: GroupDetailsProps) {
+export default function GroupDetails({ groupData, members, onRefresh, groupId, participanteId  }: GroupDetailsProps) {
   const router = useRouter();
 
   return (
@@ -34,6 +35,18 @@ export default function GroupDetails({ groupData, members, onRefresh, groupId }:
       <Text style={styles.details}>Descripción: {groupData.description}</Text>
       <Button title="Comprobantes" onPress={() => router.push("../(admin)/ComprobantesList")} />
 
+      <Button
+        title="Añadir Comprobante"
+        onPress={() =>
+          router.push({
+            pathname: "../(user)/SubirComprobante",
+            params: {
+              eventoId: groupId,
+              participanteId: participanteId?.toString(),
+            },
+          })
+        }
+      />
       <FlatList
         data={members}
         renderItem={({ item }) => (
