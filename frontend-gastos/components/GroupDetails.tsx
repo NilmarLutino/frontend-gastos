@@ -61,6 +61,7 @@ export default function GroupDetails({ groupData, members, onRefresh, groupId, p
         router.push({
           pathname: "../(user)/ReportView",
       params: {
+        eventoId: groupId,
         reportType: "Evento", // Cambia a "Usuario" si necesitas
       },
         })
