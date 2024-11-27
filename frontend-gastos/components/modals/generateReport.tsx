@@ -4,7 +4,7 @@ import { View, Text, Modal, StyleSheet, TouchableOpacity, TextInput } from "reac
 interface DateRangeModalProps {
   visible: boolean;
   onClose: () => void;
-  onViewReport: (startDate: string, endDate: string, user: string) => void;
+  onViewReport: (startDate: string, endDate: string, reportType: string) => void;
 }
 
 const DateRangeModal: React.FC<DateRangeModalProps> = ({ visible, onClose, onViewReport }) => {
@@ -47,8 +47,8 @@ const DateRangeModal: React.FC<DateRangeModalProps> = ({ visible, onClose, onVie
     }
 
     setErrorMessage(""); // Limpiar el mensaje de error si todo es válido
-    const user = "usuarioEjemplo"; // Reemplazar con el usuario real
-    onViewReport(startDate, endDate, user);
+    const reportType = "Usuario";
+    onViewReport(startDate, endDate, reportType);
     onClose();
   };
 

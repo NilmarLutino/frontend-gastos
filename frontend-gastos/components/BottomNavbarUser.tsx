@@ -9,12 +9,6 @@ export default function BottomNavbarUser() {
 
   const [isModalVisible, setModalVisible] = useState(false);
 
-  const handleViewReport = (startDate: Date, endDate: Date) => {
-    setModalVisible(false); // Cerrar el modal
-    console.log("Generando reporte desde:", startDate, "hasta:", endDate);
-    // Aquí puedes agregar la lógica para navegar a la pantalla de reportes o realizar otra acción
-  };
-
   return (
     <View style={styles.navbar}>
       <TouchableOpacity
@@ -45,10 +39,10 @@ export default function BottomNavbarUser() {
       <DateRangeModal
         visible={isModalVisible}
         onClose={() => setModalVisible(false)}
-        onViewReport={(startDate, endDate, user) =>
+        onViewReport={(startDate, endDate, reportType) =>
           router.push({
-            pathname: "/",
-            params: { startDate, endDate, user },
+            pathname: "../(user)/ReportView",
+            params: { startDate, endDate, reportType },
           })
         }
       />

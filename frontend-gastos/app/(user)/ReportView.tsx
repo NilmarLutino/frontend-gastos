@@ -2,15 +2,28 @@ import React from "react";
 import { View, Text, StyleSheet, FlatList } from "react-native";
 import { useLocalSearchParams } from "expo-router";
 
+
+type ReportType = "Evento" | "Usuario";
 type ReportViewProps = {
   reportType: "Evento" | "Usuario";
   data: any[];
 };
 
 export default function ReportView({ data }: ReportViewProps) {
-  const { reportType } = useLocalSearchParams();
-  console.log("Report Type:", reportType);
-  const isEventoReport = reportType === "Evento";
+
+  const { reportType, startDate, endDate} = useLocalSearchParams();
+
+  // Asegurar que el tipo de reporte es válido
+  const validReportType: ReportType = reportType === "Evento" || reportType === "Usuario"
+    ? reportType
+    : "Usuario"; // Valor predeterminado si no se define correctamente
+
+  console.log("Report Type:", validReportType);
+  console.log("Start Date:", startDate);
+  console.log("End Date:", endDate);
+
+  const isEventoReport = validReportType === "Evento";
+  
 
   return (
     <View style={styles.container}>
