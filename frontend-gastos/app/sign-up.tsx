@@ -12,8 +12,8 @@ import { FontAwesome } from "@expo/vector-icons";
 import { useSignUp, useOAuth } from "@clerk/clerk-expo";
 import { useRouter } from "expo-router";
 import * as Linking from "expo-linking";
+import { API_BASE_URL } from "../services/apiConfig";
 import LogoImage from "../assets/images/gastos.png";
-
 
 export default function SignUpScreen() {
   const { isLoaded, signUp } = useSignUp();
@@ -29,7 +29,10 @@ export default function SignUpScreen() {
 
       if (signUp && signUp.emailAddress) {
         setEmailAddress(signUp.emailAddress);
-        router.push({ pathname: '/username', params: { email: signUp.emailAddress } });
+        router.push({
+          pathname: "/username",
+          params: { email: signUp.emailAddress },
+        });
       } else {
         console.error("OAuth registration was not completed.");
       }
@@ -54,12 +57,12 @@ export default function SignUpScreen() {
     <View style={styles.container}>
       <View style={styles.formContainer}>
         <View style={styles.logoContainer}>
-            <Image
-              source={LogoImage} 
-              style={styles.logoImage}
-              resizeMode="contain"
-            />
-            <Text style={styles.logoText}>GASTOS COMPARTIDOS</Text>
+          <Image
+            source={LogoImage}
+            style={styles.logoImage}
+            resizeMode="contain"
+          />
+          <Text style={styles.logoText}>GASTOS COMPARTIDOS</Text>
         </View>
         <TextInput
           style={styles.input}

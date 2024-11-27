@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { API_BASE_URL } from "../../services/apiConfig";
 import {
   View,
   Text,
@@ -24,7 +25,7 @@ const ComprobanteDetail = () => {
     const fetchComprobante = async () => {
       try {
         const response = await fetch(
-          `http://localhost:3000/api/pagos/evento/${eventoId}/participante/${participanteId}`
+          `${API_BASE_URL}/api/pagos/evento/${eventoId}/participante/${participanteId}`
         );
         const data = await response.json();
 
@@ -48,14 +49,17 @@ const ComprobanteDetail = () => {
 
   const handleVerificarPago = async () => {
     try {
-      const response = await fetch(`http://localhost:3000/api/participantes/${participanteId}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
-        body: JSON.stringify({ ha_pagado: true }),
-      });
+      const response = await fetch(
+        `${API_BASE_URL}/api/participantes/${participanteId}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          body: JSON.stringify({ ha_pagado: true }),
+        }
+      );
 
       if (!response.ok) {
         throw new Error("Error al verificar el pago.");
@@ -83,15 +87,23 @@ const ComprobanteDetail = () => {
       {imageUrl ? (
         <Image source={{ uri: imageUrl }} style={styles.image} />
       ) : (
-        <Text style={styles.errorText}>No se encontró ninguna imagen de comprobante.</Text>
+        <Text style={styles.errorText}>
+          No se encontró ninguna imagen de comprobante.
+        </Text>
       )}
       <View style={styles.buttonContainer}>
         {userRole === "Propietario" && (
-          <TouchableOpacity style={styles.verifyButton} onPress={handleVerificarPago}>
+          <TouchableOpacity
+            style={styles.verifyButton}
+            onPress={handleVerificarPago}
+          >
             <Text style={styles.buttonText}>Verificar pago</Text>
           </TouchableOpacity>
         )}
-        <TouchableOpacity style={styles.closeButton} onPress={() => router.back()}>
+        <TouchableOpacity
+          style={styles.closeButton}
+          onPress={() => router.back()}
+        >
           <Text style={styles.buttonText}>Cerrar</Text>
         </TouchableOpacity>
       </View>

@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { API_BASE_URL } from "../../services/apiConfig";
 import {
   View,
   Text,
@@ -17,7 +18,8 @@ export default function UploadImage() {
 
   const pickImage = async () => {
     try {
-      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      const { status } =
+        await ImagePicker.requestMediaLibraryPermissionsAsync();
       if (status !== "granted") {
         Alert.alert("Permiso denegado", "Se requiere acceso a la galería.");
         return;
@@ -40,7 +42,10 @@ export default function UploadImage() {
 
   const uploadImage = async () => {
     if (!imageUri || !eventoId || !participanteId) {
-      Alert.alert("Error", "Por favor, selecciona una imagen y asegúrate de que los datos sean válidos.");
+      Alert.alert(
+        "Error",
+        "Por favor, selecciona una imagen y asegúrate de que los datos sean válidos."
+      );
       return;
     }
 
@@ -55,7 +60,7 @@ export default function UploadImage() {
       formData.append("monto", "0");
       formData.append("fecha_pago", new Date().toISOString().split("T")[0]);
 
-      const uploadResponse = await fetch("http://localhost:3000/api/pagos", {
+      const uploadResponse = await fetch(`${API_BASE_URL}/api/pagos`, {
         method: "POST",
         body: formData,
       });
@@ -64,10 +69,15 @@ export default function UploadImage() {
       console.log("Respuesta del servidor:", data);
 
       if (data.result && data.result.url_comprobante) {
-        Alert.alert("Éxito", `Imagen subida y URL almacenada: ${data.result.url_comprobante[0]}`);
+        Alert.alert(
+          "Éxito",
+          `Imagen subida y URL almacenada: ${data.result.url_comprobante[0]}`
+        );
         router.back();
       } else {
-        throw new Error("La respuesta del servidor no contiene una URL válida.");
+        throw new Error(
+          "La respuesta del servidor no contiene una URL válida."
+        );
       }
     } catch (error) {
       console.error("Error al subir la imagen:", error);
@@ -91,7 +101,10 @@ export default function UploadImage() {
         <TouchableOpacity style={styles.redButton} onPress={uploadImage}>
           <Text style={styles.buttonText}>Subir Imagen</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.redButton} onPress={() => router.back()}>
+        <TouchableOpacity
+          style={styles.redButton}
+          onPress={() => router.back()}
+        >
           <Text style={styles.buttonText}>Cerrar</Text>
         </TouchableOpacity>
       </View>
@@ -148,4 +161,3 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
 });
-

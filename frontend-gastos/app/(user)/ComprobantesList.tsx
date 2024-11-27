@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { API_BASE_URL } from "../../services/apiConfig";
 import {
   View,
   Text,
@@ -11,11 +12,12 @@ import { useRouter, useLocalSearchParams } from "expo-router";
 
 const ComprobantesList = () => {
   const router = useRouter();
-  const { groupId, participanteIds, participanteNombres } = useLocalSearchParams<{
-    groupId: string;
-    participanteIds: string;
-    participanteNombres: string;
-  }>();
+  const { groupId, participanteIds, participanteNombres } =
+    useLocalSearchParams<{
+      groupId: string;
+      participanteIds: string;
+      participanteNombres: string;
+    }>();
   const [comprobantes, setComprobantes] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
 
@@ -23,7 +25,9 @@ const ComprobantesList = () => {
     const fetchComprobantes = async () => {
       try {
         if (!participanteIds || !groupId || !participanteNombres) {
-          console.error("Faltan participanteIds, groupId, o participanteNombres");
+          console.error(
+            "Faltan participanteIds, groupId, o participanteNombres"
+          );
           return;
         }
 
@@ -34,7 +38,7 @@ const ComprobantesList = () => {
         const comprobantesPromises = ids.map(async (id, index) => {
           try {
             const response = await fetch(
-              `http://localhost:3000/api/pagos/evento/${groupId}/participante/${id}`
+              `${API_BASE_URL}/api/pagos/evento/${groupId}/participante/${id}`
             );
             const data = await response.json();
             return {
@@ -43,7 +47,10 @@ const ComprobantesList = () => {
               files: data.result[0]?.files || [],
             };
           } catch (error) {
-            console.error(`Error fetching comprobantes for participanteId ${id}:`, error);
+            console.error(
+              `Error fetching comprobantes for participanteId ${id}:`,
+              error
+            );
             return null;
           }
         });
@@ -73,7 +80,10 @@ const ComprobantesList = () => {
     <View style={styles.container}>
       <Text style={styles.title}>COMPROBANTES</Text>
       {comprobantes.map((comprobante) => (
-        <View key={comprobante.participanteId} style={styles.comprobanteContainer}>
+        <View
+          key={comprobante.participanteId}
+          style={styles.comprobanteContainer}
+        >
           <Text style={styles.name}>{comprobante.nombre}</Text>
           {comprobante.files.length > 0 ? (
             comprobante.files.map((fileUrl: string, index: number) => (

@@ -6,7 +6,7 @@ import {
   TextInput,
   StyleSheet,
   Alert,
-  Image
+  Image,
 } from "react-native";
 import { useRouter } from "expo-router";
 import { useOAuth, useUser, useSession, useSignIn } from "@clerk/clerk-expo";
@@ -14,6 +14,7 @@ import * as Linking from "expo-linking";
 import axios from "axios";
 import { FontAwesome } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { API_BASE_URL } from "../services/apiConfig";
 import LogoImage from "../assets/images/gastos.png";
 
 export default function LoginScreen() {
@@ -57,7 +58,10 @@ export default function LoginScreen() {
         console.log("User signed in successfully.");
         router.push("/(user)/myGroups");
       } else {
-        console.error("Sign-in attempt incomplete:", JSON.stringify(signInAttempt, null, 2));
+        console.error(
+          "Sign-in attempt incomplete:",
+          JSON.stringify(signInAttempt, null, 2)
+        );
       }
     } catch (error) {
       console.error("Error during sign-in:", JSON.stringify(error, null, 2));
@@ -82,7 +86,9 @@ export default function LoginScreen() {
     const fetchUserFromBackend = async (email: string) => {
       try {
         setLoading(true);
-        const response = await axios.get(`http://localhost:3000/api/usuarios/email/${email}`);
+        const response = await axios.get(
+          `${API_BASE_URL}/api/usuarios/email/${email}`
+        );
         console.log("User data from backend:", response.data);
 
         if (response.data) {
@@ -123,12 +129,12 @@ export default function LoginScreen() {
     <View style={styles.container}>
       <View style={styles.formContainer}>
         <View style={styles.logoContainer}>
-            <Image
-              source={LogoImage} 
-              style={styles.logoImage}
-              resizeMode="contain"
-            />
-            <Text style={styles.logoText}>GASTOS COMPARTIDOS</Text>
+          <Image
+            source={LogoImage}
+            style={styles.logoImage}
+            resizeMode="contain"
+          />
+          <Text style={styles.logoText}>GASTOS COMPARTIDOS</Text>
         </View>
         <Text style={styles.labelText}>Correo:</Text>
         <TextInput
@@ -150,15 +156,28 @@ export default function LoginScreen() {
           value={password}
           onChangeText={setPassword}
         />
-        <TouchableOpacity style={styles.button} onPress={handleSignIn} disabled={loading}>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={handleSignIn}
+          disabled={loading}
+        >
           <Text style={styles.buttonText}>
             {loading ? "Signing in..." : "Iniciar Sesión"}
           </Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.button} onPress={handleLoginWithGoogle} disabled={loading}>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={handleLoginWithGoogle}
+          disabled={loading}
+        >
           <Text style={styles.buttonText}>
             {loading ? "Signing in..." : "Ingresar con Google"}
-            <FontAwesome style={styles.icon} name="google" size={16} color="#f2f2f2" />
+            <FontAwesome
+              style={styles.icon}
+              name="google"
+              size={16}
+              color="#f2f2f2"
+            />
           </Text>
         </TouchableOpacity>
         <TouchableOpacity onPress={handleSignUp}>

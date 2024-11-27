@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { API_BASE_URL } from "../../services/apiConfig";
 import {View,Text,TextInput,StyleSheet,TouchableOpacity,Alert} from "react-native";
 import { useRouter } from "expo-router";
 import { createEvent } from "../../services/eventService";

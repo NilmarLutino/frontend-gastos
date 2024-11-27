@@ -1,12 +1,19 @@
 import React, { useState, useEffect } from "react";
+import { API_BASE_URL } from "../../services/apiConfig";
 import { View, StyleSheet, ActivityIndicator, Alert, Text } from "react-native";
-import { useLocalSearchParams, useFocusEffect  } from "expo-router";
+import { useLocalSearchParams, useFocusEffect } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import GroupDetails from "../../components/GroupDetails";
 import BottomNavbar from "../../components/BottomNavbarGroupView";
 import AddMember from "../../components/modals/addMember";
 import ModalError from "../../components/modals/modalError";
-import { fetchEventSummary, fetchEventParticipants, fetchEventParticipantExpenses, addParticipant, fetchUserByEmail } from "../../services/eventService"; // Asegúrate de tener estas funciones
+import {
+  fetchEventSummary,
+  fetchEventParticipants,
+  fetchEventParticipantExpenses,
+  addParticipant,
+  fetchUserByEmail,
+} from "../../services/eventService"; // Asegúrate de tener estas funciones
 import BottomNavbarGroupView from "../../components/BottomNavbarGroupView";
 
 // Definición de GroupData
@@ -17,11 +24,19 @@ type GroupData = {
   totalExpenses: number;
   paidCount: number;
   description: string;
-  members: { id: string; name: string; balance: number; expenses: { item: string; amount: number }[] }[];
+  members: {
+    id: string;
+    name: string;
+    balance: number;
+    expenses: { item: string; amount: number }[];
+  }[];
 };
 
 export default function GroupDetailPage() {
-  const { groupId, userRole } = useLocalSearchParams<{ groupId: string, userRole: string }>();
+  const { groupId, userRole } = useLocalSearchParams<{
+    groupId: string;
+    userRole: string;
+  }>();
   const [groupData, setGroupData] = useState<GroupData | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [errorMessage, setErrorMessage] = useState<string>("");
@@ -29,7 +44,6 @@ export default function GroupDetailPage() {
   const [isModalErrorVisible, setModalErrorVisible] = useState<boolean>(false);
   const [userId, setUserId] = useState<number | null>(null);
   const [participanteId, setParticipanteId] = useState<string | null>(null);
-  
 
   // Función para obtener el userId de AsyncStorage
   const getUserId = async () => {
@@ -54,19 +68,24 @@ export default function GroupDetailPage() {
       const eventSummary = await fetchEventSummary(groupId, userId);
       const participants = await fetchEventParticipants(groupId);
 
-
-      const participant = participants.find((p: any) => p.usuario_id === userId);
+      const participant = participants.find(
+        (p: any) => p.usuario_id === userId
+      );
       if (participant) {
         setParticipanteId(participant.participante_id.toString());
-        
       }
-      
-      
-      
+
       const members = await Promise.all(
         participants.map(async (participant: any) => {
-          const expenses = await fetchEventParticipantExpenses(participant.participante_id, groupId);
-          const balance = expenses.reduce((total: number, expense: any) => total + parseFloat(expense.monto_gasto), 0);
+          const expenses = await fetchEventParticipantExpenses(
+            participant.participante_id,
+            groupId
+          );
+          const balance = expenses.reduce(
+            (total: number, expense: any) =>
+              total + parseFloat(expense.monto_gasto),
+            0
+          );
 
           return {
             id: participant.participante_id.toString(),
@@ -80,7 +99,10 @@ export default function GroupDetailPage() {
         })
       );
 
-      const totalExpenses = members.reduce((total, member) => total + member.balance, 0);
+      const totalExpenses = members.reduce(
+        (total, member) => total + member.balance,
+        0
+      );
 
       const mappedData: GroupData = {
         groupName: eventSummary.nombre_evento,
@@ -117,7 +139,9 @@ export default function GroupDetailPage() {
         onRefresh();
         Alert.alert("Éxito", "Participante añadido correctamente");
       } else {
-        setErrorMessage("Usuario no encontrado, verifique si el correo es correcto");
+        setErrorMessage(
+          "Usuario no encontrado, verifique si el correo es correcto"
+        );
         setModalErrorVisible(true);
       }
     } catch (error) {
@@ -163,12 +187,12 @@ export default function GroupDetailPage() {
   return (
     <View style={styles.pageContainer}>
       <GroupDetails
-  groupData={groupData}
-  members={groupData.members}
-  onRefresh={onRefresh}
-  groupId={groupId} // Pasar el groupId aquí
-  participanteId={participanteId || ""} // Asegúrate de convertirlo a string
-/>
+        groupData={groupData}
+        members={groupData.members}
+        onRefresh={onRefresh}
+        groupId={groupId} // Pasar el groupId aquí
+        participanteId={participanteId || ""} // Asegúrate de convertirlo a string
+      />
 
       <AddMember
         visible={isAddMemberVisible}
@@ -181,12 +205,11 @@ export default function GroupDetailPage() {
         message={errorMessage}
       />
       <BottomNavbarGroupView
-      userRole={userRole}
-  actionLabel="Añadir participante"
-  onAction={() => setAddMemberVisible(true)}
-  onAddMember={() => setAddMemberVisible(true)} // Asegúrate de pasar esta función.
-/>
-
+        userRole={userRole}
+        actionLabel="Añadir participante"
+        onAction={() => setAddMemberVisible(true)}
+        onAddMember={() => setAddMemberVisible(true)} // Asegúrate de pasar esta función.
+      />
     </View>
   );
 }
@@ -202,5 +225,4 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  
 });
