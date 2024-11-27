@@ -42,6 +42,7 @@ export default function GroupDetails({ groupData, members, onRefresh, groupId, p
 
       {/* Mostrar botones solo si el usuario es propietario */}
       {userRole === "Propietario" && (
+        <View style={{ flexDirection: "row", justifyContent: "space-between", marginVertical: 10 }}>
         <TouchableOpacity
           onPress={() => router.push({
             pathname: "../(user)/ComprobantesList",
@@ -51,12 +52,29 @@ export default function GroupDetails({ groupData, members, onRefresh, groupId, p
               participanteNombres: members.map((member) => member.name).join(","),
             },
           })}
-          style={styles.button}
+          style={[styles.button, { flex: 1, marginRight: 5 }]}
         >
           <Text style={styles.buttonText}>Comprobantes</Text>
         </TouchableOpacity>
+        <TouchableOpacity
+      onPress={() =>
+        router.push({
+          pathname: "../(user)/ReportView",
+      params: {
+        reportType: "Evento", // Cambia a "Usuario" si necesitas
+      },
+        })
+      }
+      style={[styles.button, { flex: 1, marginLeft: 5 }]}
+    >
+      <Text style={styles.buttonText}>Ver Reporte</Text>
+    </TouchableOpacity>
+    </View>
+        
 
       )}
+
+      
 
       {/* Mostrar botones solo si el usuario es "Invitado" */}
       {userRole === "Invitado" && (
