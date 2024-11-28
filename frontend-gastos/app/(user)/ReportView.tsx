@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, StyleSheet, FlatList, ActivityIndicator, Alert, TouchableOpacity } from "react-native";
 import { useLocalSearchParams } from "expo-router";
+import { useRouter } from "expo-router";
+
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { jsPDF } from "jspdf";
@@ -9,6 +11,7 @@ import { API_BASE_URL } from "../../services/apiConfig";
 type ReportType = "Evento" | "Usuario";
 
 export default function ReportView() {
+  const router = useRouter();
   const { reportType, eventoId, fechaInicio, fechaFin } =
     useLocalSearchParams();
   const [data, setData] = useState<any[]>([]);
@@ -73,6 +76,7 @@ export default function ReportView() {
           if (Array.isArray(result)) {
             const formattedData = result.map((item, index) => ({
               id: index + 1,
+              numero: item.numero,
               nombreUsuario: item.nombre_usuario,
               nombreEvento: item.nombre_evento,
               fechaCreacion: item.fecha_creacion
@@ -98,6 +102,7 @@ export default function ReportView() {
           const detalles = response?.data?.result?.result?.detalles;
           if (Array.isArray(detalles)) {
             const eventDetails = detalles.map((item: any) => ({
+              numero: item.numero,
               nombreUsuario: item.nombre_usuario,
               totalGasto: item.total_gasto,
               gastosDetalles:
@@ -166,6 +171,7 @@ export default function ReportView() {
             data={data}
             keyExtractor={(_, index) => index.toString()}
             renderItem={({ item, index }) => (
+              
               <View
                 style={[styles.tableRow, index % 2 === 0 && styles.rowEven]}
               >
@@ -184,9 +190,15 @@ export default function ReportView() {
                 <Text style={styles.cell}>{item.pagado ? "✔" : "✘"}</Text>
                 <Text
                   style={[styles.cell, styles.link]}
-                  onPress={() => console.log("Abrir comprobante", item.comprobantes)}
+                  onPress={() =>
+                    router.push({
+                      pathname: "../(user)/ComprobanteDetail",
+                      params: { eventoId: eventoId, participanteId: item.numero , userRole: "Invitado" },
+                      
+                    })
+                  }
                 >
-                  Ver Comprobante
+                  Ver Comprobantes
                 </Text>
               </View>
             )}
