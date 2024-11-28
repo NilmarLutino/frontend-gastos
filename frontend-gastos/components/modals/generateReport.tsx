@@ -1,16 +1,35 @@
 import React, { useState } from "react";
-import { View, Text, Modal, StyleSheet, TouchableOpacity, TextInput } from "react-native";
+import {
+  View,
+  Text,
+  Modal,
+  StyleSheet,
+  TouchableOpacity,
+  TextInput,
+  Platform,
+} from "react-native";
+import DateTimePicker from "@react-native-community/datetimepicker";
 
 interface DateRangeModalProps {
   visible: boolean;
   onClose: () => void;
-  onViewReport: (startDate: string, endDate: string, reportType: string) => void;
+  onViewReport: (
+    startDate: string,
+    endDate: string,
+    reportType: string
+  ) => void;
 }
 
-const DateRangeModal: React.FC<DateRangeModalProps> = ({ visible, onClose, onViewReport }) => {
+const DateRangeModal: React.FC<DateRangeModalProps> = ({
+  visible,
+  onClose,
+  onViewReport,
+}) => {
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+  const [showPicker, setShowPicker] = useState(false);
+  const [pickerTarget, setPickerTarget] = useState<"start" | "end">("start");
 
   const isValidDate = (date: string): boolean => {
     const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
@@ -37,19 +56,40 @@ const DateRangeModal: React.FC<DateRangeModalProps> = ({ visible, onClose, onVie
     }
 
     if (!isValidDate(startDate) || !isValidDate(endDate)) {
-      setErrorMessage("Las fechas deben ser válidas y tener el formato YYYY-MM-DD.");
+      setErrorMessage(
+        "Las fechas deben ser válidas y tener el formato YYYY-MM-DD."
+      );
       return;
     }
 
     if (new Date(startDate) > new Date(endDate)) {
-      setErrorMessage("La fecha de inicio no puede ser mayor que la fecha de fin.");
+      setErrorMessage(
+        "La fecha de inicio no puede ser mayor que la fecha de fin."
+      );
       return;
     }
 
-    setErrorMessage(""); // Limpiar el mensaje de error si todo es válido
+    setErrorMessage("");
     const reportType = "Usuario";
     onViewReport(startDate, endDate, reportType);
     onClose();
+  };
+
+  const handleDateChange = (event: any, selectedDate?: Date) => {
+    setShowPicker(false);
+    if (selectedDate) {
+      const formattedDate = selectedDate.toISOString().split("T")[0];
+      if (pickerTarget === "start") {
+        setStartDate(formattedDate);
+      } else {
+        setEndDate(formattedDate);
+      }
+    }
+  };
+
+  const openPicker = (target: "start" | "end") => {
+    setPickerTarget(target);
+    setShowPicker(true);
   };
 
   const formatDateInput = (text: string, setDate: (date: string) => void) => {
@@ -70,30 +110,58 @@ const DateRangeModal: React.FC<DateRangeModalProps> = ({ visible, onClose, onVie
         <View style={styles.modalContent}>
           <Text style={styles.title}>SELECCIONAR RANGO DE FECHAS</Text>
           <View style={styles.dateContainer}>
-            <Text style={styles.label}>Fecha Inicio (YYYY-MM-DD):</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="2024-01-01"
-              value={startDate}
-              onChangeText={(text) => formatDateInput(text, setStartDate)}
-              keyboardType="numeric"
-              maxLength={10}
-            />
+            <Text style={styles.label}>Fecha Inicio:</Text>
+            <View style={styles.inputRow}>
+              <TextInput
+                style={styles.input}
+                placeholder="YYYY-MM-DD"
+                value={startDate}
+                onChangeText={(text) => formatDateInput(text, setStartDate)}
+                keyboardType="numeric"
+                maxLength={10}
+              />
+              <TouchableOpacity
+                style={styles.pickerButton}
+                onPress={() => openPicker("start")}
+              >
+                <Text style={styles.pickerButtonText}>📅</Text>
+              </TouchableOpacity>
+            </View>
           </View>
           <View style={styles.dateContainer}>
-            <Text style={styles.label}>Fecha Fin (YYYY-MM-DD):</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="2024-12-31"
-              value={endDate}
-              onChangeText={(text) => formatDateInput(text, setEndDate)}
-              keyboardType="numeric"
-              maxLength={10}
-            />
+            <Text style={styles.label}>Fecha Fin:</Text>
+            <View style={styles.inputRow}>
+              <TextInput
+                style={styles.input}
+                placeholder="YYYY-MM-DD"
+                value={endDate}
+                onChangeText={(text) => formatDateInput(text, setEndDate)}
+                keyboardType="numeric"
+                maxLength={10}
+              />
+              <TouchableOpacity
+                style={styles.pickerButton}
+                onPress={() => openPicker("end")}
+              >
+                <Text style={styles.pickerButtonText}>📅</Text>
+              </TouchableOpacity>
+            </View>
           </View>
-          {errorMessage ? (
+          {showPicker && (
+            <DateTimePicker
+              value={
+                pickerTarget === "start" && startDate
+                  ? new Date(startDate)
+                  : new Date()
+              }
+              mode="date"
+              display={Platform.OS === "ios" ? "inline" : "default"}
+              onChange={handleDateChange}
+            />
+          )}
+          {errorMessage && (
             <Text style={styles.errorMessage}>{errorMessage}</Text>
-          ) : null}
+          )}
           <View style={styles.buttonContainer}>
             <TouchableOpacity style={styles.button} onPress={handleViewReport}>
               <Text style={styles.buttonText}>Ver Reporte</Text>
@@ -116,7 +184,7 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
   modalContent: {
-    width: 300,
+    width: "90%",
     padding: 20,
     backgroundColor: "#FDF6F0",
     borderRadius: 10,
@@ -141,13 +209,24 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginBottom: 5,
   },
+  inputRow: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
   input: {
+    flex: 1,
     borderColor: "#B0B0B0",
     borderWidth: 1,
     borderRadius: 5,
     padding: 10,
     backgroundColor: "#fff",
     fontSize: 16,
+  },
+  pickerButton: {
+    marginLeft: 10,
+  },
+  pickerButtonText: {
+    fontSize: 24,
   },
   errorMessage: {
     color: "red",
