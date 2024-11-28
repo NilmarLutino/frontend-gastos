@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, StyleSheet, FlatList, ActivityIndicator, Alert } from "react-native";
+import { View, Text, StyleSheet, FlatList, ActivityIndicator, Alert, TouchableOpacity } from "react-native";
 import { useLocalSearchParams } from "expo-router";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { jsPDF } from "jspdf";
+
 
 type ReportType = "Evento" | "Usuario";
 
@@ -20,6 +22,18 @@ export default function ReportView() {
     } catch (error) {
       console.error("Failed to get user ID:", error);
       return null;
+    }
+  };
+
+
+  const handleDownloadReport = async () => {
+    try {
+      // Aquí iría la lógica para descargar el reporte
+      console.log("Descargando reporte...");
+      Alert.alert("Reporte descargado", "El reporte se descargó correctamente.");
+    } catch (error) {
+      console.error("Error al descargar el reporte:", error);
+      Alert.alert("Error", "Hubo un problema al descargar el reporte.");
     }
   };
 
@@ -106,7 +120,13 @@ export default function ReportView() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Reporte de {reportType}</Text>
+      <View style={styles.header}>
+        <Text style={styles.title}>Reporte de {reportType}</Text>
+        <TouchableOpacity style={styles.downloadButton} onPress={handleDownloadReport}>
+          <Text style={styles.downloadButtonText}>Descargar Reporte</Text>
+        </TouchableOpacity>
+      </View>
+
       {loading ? (
         <ActivityIndicator size="large" color="#BF0413" />
       ) : error ? (
@@ -120,7 +140,7 @@ export default function ReportView() {
             <Text style={styles.headerCell}>
               {isEventoReport ? "Nombre Usuario" : "Nombre Evento"}
             </Text>
-            {isUsuarioReport && <Text style={styles.headerCell}>Fecha de Creación</Text>} {/* Nueva columna */}
+            {isUsuarioReport && <Text style={styles.headerCell}>Fecha de Creación</Text>}
             <Text style={styles.headerCell}>Gasto</Text>
             {isEventoReport && <Text style={styles.headerCell}>Gastos Detalles</Text>}
             <Text style={styles.headerCell}>Fecha de Pago</Text>
@@ -135,7 +155,7 @@ export default function ReportView() {
                 <Text style={styles.cell}>{index + 1}</Text>
                 <Text style={styles.cell}>{isEventoReport ? item.nombreUsuario : item.nombreEvento}</Text>
                 {isUsuarioReport && (
-                  <Text style={styles.cell}>{item.fechaCreacion}</Text> /* Datos para la columna */
+                  <Text style={styles.cell}>{item.fechaCreacion}</Text>
                 )}
                 <Text style={styles.cell}>{item.gasto || item.totalGasto}</Text>
                 {isEventoReport && <Text style={styles.cell}>{item.gastosDetalles}</Text>}
@@ -143,8 +163,7 @@ export default function ReportView() {
                 <Text style={styles.cell}>{item.pagado ? "✔" : "✘"}</Text>
                 <Text
                   style={[styles.cell, styles.link]}
-                  onPress={() => console.log("Abrir comprobante", item.comprobantes)
-                  }
+                  onPress={() => console.log("Abrir comprobante", item.comprobantes)}
                 >
                   Ver Comprobante
                 </Text>
@@ -163,11 +182,28 @@ const styles = StyleSheet.create({
     padding: 20,
     backgroundColor: "#ECE2D9",
   },
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 15,
+  },
   title: {
+    flex: 1,
     fontSize: 24,
     fontWeight: "bold",
-    marginBottom: 20,
     textAlign: "center",
+  },
+  downloadButton: {
+    backgroundColor: "#BF0413",
+    paddingHorizontal: 15,
+    paddingVertical: 10,
+    borderRadius: 5,
+  },
+  downloadButtonText: {
+    color: "#FFF",
+    fontSize: 16,
+    fontWeight: "bold",
   },
   table: {
     borderWidth: 1,
