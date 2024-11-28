@@ -1,18 +1,13 @@
 import React, { useState, useEffect } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  FlatList,
-  ActivityIndicator,
-  Alert,
-} from "react-native";
+import { View, Text, StyleSheet, FlatList, ActivityIndicator, Alert, TouchableOpacity } from "react-native";
 import { useLocalSearchParams } from "expo-router";
 import { useRouter } from "expo-router";
-
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { API_BASE_URL } from "../../services/apiConfig";
+import * as Sharing from 'expo-sharing';
+import * as FileSystem from 'expo-file-system';
+import * as XLSX from 'xlsx';
 
 type ReportType = "Evento" | "Usuario";
 
@@ -32,6 +27,40 @@ export default function ReportView() {
     } catch (error) {
       console.error("Failed to get user ID:", error);
       return null;
+    }
+  };
+
+  const handleDownloadReport = async () => {
+    try {
+      // 1. Filtrar los datos y eliminar la columna de "Comprobantes"
+      const filteredData = data.map((item) => {
+        const { Comprobantes, ...rest } = item; // Eliminar la propiedad Comprobantes
+        return rest;
+      });
+  
+      // 2. Crear una hoja de Excel
+      const ws = XLSX.utils.json_to_sheet(filteredData);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "Reporte");
+  
+      // 3. Generar un archivo Excel en formato binario
+      const excelData = XLSX.write(wb, { bookType: "xlsx", type: "base64" });
+  
+      // 4. Guardar el archivo en el sistema de archivos
+      const filePath = FileSystem.documentDirectory + "reporte.xlsx";
+      await FileSystem.writeAsStringAsync(filePath, excelData, {
+        encoding: FileSystem.EncodingType.Base64,
+      });
+  
+      // 5. Compartir el archivo directamente usando expo-sharing
+      if (await Sharing.isAvailableAsync()) {
+        await Sharing.shareAsync(filePath);
+      } else {
+        Alert.alert("Error", "No se pudo compartir el archivo");
+      }
+    } catch (error) {
+      console.error("Error al generar el reporte:", error);
+      Alert.alert("Error", "No se pudo generar el reporte");
     }
   };
 
@@ -129,7 +158,13 @@ export default function ReportView() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Reporte de {reportType}</Text>
+      <View style={styles.header}>
+        <Text style={styles.title}>Reporte de {reportType}</Text>
+        <TouchableOpacity style={styles.downloadButton} onPress={handleDownloadReport}>
+          <Text style={styles.downloadButtonText}>Descargar Reporte</Text>
+        </TouchableOpacity>
+      </View>
+
       {loading ? (
         <ActivityIndicator size="large" color="#BF0413" />
       ) : error ? (
@@ -168,9 +203,7 @@ export default function ReportView() {
                   {isEventoReport ? item.nombreUsuario : item.nombreEvento}
                 </Text>
                 {isUsuarioReport && (
-                  <Text style={styles.cell}>
-                    {item.fechaCreacion}
-                  </Text> /* Datos para la columna */
+                  <Text style={styles.cell}>{item.fechaCreacion}</Text>
                 )}
                 <Text style={styles.cell}>{item.gasto || item.totalGasto}</Text>
                 {isEventoReport && (
@@ -205,11 +238,28 @@ const styles = StyleSheet.create({
     padding: 20,
     backgroundColor: "#ECE2D9",
   },
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 15,
+  },
   title: {
+    flex: 1,
     fontSize: 24,
     fontWeight: "bold",
-    marginBottom: 20,
     textAlign: "center",
+  },
+  downloadButton: {
+    backgroundColor: "#BF0413",
+    paddingHorizontal: 15,
+    paddingVertical: 10,
+    borderRadius: 5,
+  },
+  downloadButtonText: {
+    color: "#FFF",
+    fontSize: 16,
+    fontWeight: "bold",
   },
   table: {
     borderWidth: 1,
