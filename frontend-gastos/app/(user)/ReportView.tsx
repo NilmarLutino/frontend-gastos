@@ -1,24 +1,36 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, StyleSheet, FlatList, ActivityIndicator } from "react-native";
+import { View, Text, StyleSheet, FlatList, ActivityIndicator, Alert } from "react-native";
 import { useLocalSearchParams } from "expo-router";
 import axios from "axios";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 type ReportType = "Evento" | "Usuario";
 
 export default function ReportView() {
-  const { reportType, eventoId } = useLocalSearchParams();
+  const { reportType, eventoId, fechaInicio, fechaFin } = useLocalSearchParams();
   const [data, setData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  console.log("EventoID reportes:", eventoId);
+  // Función para obtener el userId del almacenamiento local
+  const getUserIdFromStorage = async (): Promise<number | null> => {
+    try {
+      const id = await AsyncStorage.getItem("userId");
+      return id ? parseInt(id, 10) : null;
+    } catch (error) {
+      console.error("Failed to get user ID:", error);
+      return null;
+    }
+  };
 
-  // Asegurar que el tipo de reporte es válido
-  const validReportType: ReportType = reportType === "Evento" || reportType === "Usuario"
-    ? reportType
-    : "Usuario"; // Valor predeterminado si no se define correctamente
+  console.log("Parámetros recibidos:");
+  console.log("reportType:", reportType);
+  console.log("eventoId:", eventoId);
+  console.log("fechaInicio:", fechaInicio);
+  console.log("fechaFin:", fechaFin);
 
-  const isEventoReport = validReportType === "Evento";
+  const isUsuarioReport = reportType === "Usuario";
+  const isEventoReport = reportType === "Evento";
 
   useEffect(() => {
     const fetchData = async () => {
@@ -26,14 +38,45 @@ export default function ReportView() {
         setLoading(true);
         setError(null);
 
-        console.log("Evento ID recibido:", eventoId);
+        if (isUsuarioReport) {
+          console.log("Cargando reporte de usuarios...");
 
-        if (isEventoReport) {
+          const userId = await getUserIdFromStorage();
+          if (!userId) {
+            Alert.alert("Error", "User ID not found.");
+            setLoading(false);
+            return;
+          }
+
+          const response = await axios.get(
+            `http://localhost:3000/api/reportes/usuario/${userId}`,
+            { params: { fechaInicio, fechaFin } }
+          );
+          console.log("Respuesta de usuarios:", response.data);
+
+          const { result } = response.data;
+          if (Array.isArray(result)) {
+            const formattedData = result.map((item, index) => ({
+              id: index + 1,
+              nombreUsuario: item.nombre_usuario,
+              nombreEvento: item.nombre_evento,
+              fechaCreacion: item.fecha_creacion ? item.fecha_creacion.split(" ")[0] : "N/A", // Extraer solo la fecha
+              gasto: item.gasto || "Sin datos",
+              fechaPago: item.fecha_pago || "N/A",
+              pagado: item.pagado,
+              linkComprobantePago: item.link_comprobante_pago || [],
+            }));
+            setData(formattedData);
+          } else {
+            setData([]);
+          }
+        } else if (isEventoReport) {
+          console.log("Cargando reporte de eventos...");
+
           const response = await axios.get(`http://localhost:3000/api/reportes/evento/${eventoId}`);
-          console.log("Respuesta del backend:", response.data);
+          console.log("Respuesta de eventos:", response.data);
 
           const detalles = response?.data?.result?.result?.detalles;
-
           if (Array.isArray(detalles)) {
             const eventDetails = detalles.map((item: any) => ({
               nombreUsuario: item.nombre_usuario,
@@ -45,10 +88,8 @@ export default function ReportView() {
               pagado: item.ha_pagado,
               comprobantes: item.pagos.length > 0 ? item.pagos[0].comprobantes : [],
             }));
-            console.log("Datos procesados para la tabla:", eventDetails);
             setData(eventDetails);
           } else {
-            console.warn("El campo 'detalles' no es un array o está vacío:", detalles);
             setData([]);
           }
         }
@@ -61,11 +102,11 @@ export default function ReportView() {
     };
 
     fetchData();
-  }, [eventoId, reportType]);
+  }, [eventoId, reportType, fechaInicio, fechaFin]);
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Reporte de {validReportType}</Text>
+      <Text style={styles.title}>Reporte de {reportType}</Text>
       {loading ? (
         <ActivityIndicator size="large" color="#BF0413" />
       ) : error ? (
@@ -74,35 +115,36 @@ export default function ReportView() {
         <Text style={styles.error}>No hay datos para mostrar</Text>
       ) : (
         <View style={styles.table}>
-          {/* Cabecera de la tabla */}
           <View style={styles.tableHeader}>
             <Text style={styles.headerCell}>Número</Text>
             <Text style={styles.headerCell}>
               {isEventoReport ? "Nombre Usuario" : "Nombre Evento"}
             </Text>
+            {isUsuarioReport && <Text style={styles.headerCell}>Fecha de Creación</Text>} {/* Nueva columna */}
             <Text style={styles.headerCell}>Gasto</Text>
             {isEventoReport && <Text style={styles.headerCell}>Gastos Detalles</Text>}
             <Text style={styles.headerCell}>Fecha de Pago</Text>
             <Text style={styles.headerCell}>Pagado</Text>
             <Text style={styles.headerCell}>Comprobante</Text>
           </View>
-          {/* Cuerpo de la tabla */}
           <FlatList
             data={data}
             keyExtractor={(_, index) => index.toString()}
             renderItem={({ item, index }) => (
               <View style={[styles.tableRow, index % 2 === 0 && styles.rowEven]}>
                 <Text style={styles.cell}>{index + 1}</Text>
-                <Text style={styles.cell}>{item.nombreUsuario}</Text>
-                <Text style={styles.cell}>{item.totalGasto}</Text>
-                {isEventoReport && (
-                  <Text style={styles.cell}>{item.gastosDetalles}</Text>
+                <Text style={styles.cell}>{isEventoReport ? item.nombreUsuario : item.nombreEvento}</Text>
+                {isUsuarioReport && (
+                  <Text style={styles.cell}>{item.fechaCreacion}</Text> /* Datos para la columna */
                 )}
+                <Text style={styles.cell}>{item.gasto || item.totalGasto}</Text>
+                {isEventoReport && <Text style={styles.cell}>{item.gastosDetalles}</Text>}
                 <Text style={styles.cell}>{item.fechaPago}</Text>
                 <Text style={styles.cell}>{item.pagado ? "✔" : "✘"}</Text>
                 <Text
                   style={[styles.cell, styles.link]}
-                  onPress={() => console.log("Abrir comprobante", item.comprobantes)}
+                  onPress={() => console.log("Abrir comprobante", item.comprobantes)
+                  }
                 >
                   Ver Comprobante
                 </Text>
