@@ -5,9 +5,10 @@ import {
   Text,
   Image,
   StyleSheet,
-  Button,
   ActivityIndicator,
   TouchableOpacity,
+  FlatList,
+  useWindowDimensions,
 } from "react-native";
 import { useRouter, useLocalSearchParams } from "expo-router";
 
@@ -18,8 +19,9 @@ const ComprobanteDetail = () => {
     participanteId: string;
     userRole: string;
   }>();
-  const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const [imageUrls, setImageUrls] = useState<string[]>([]); // Manejo de múltiples imágenes
   const [loading, setLoading] = useState<boolean>(true);
+  const { width } = useWindowDimensions(); // Hook para obtener el ancho de la pantalla
 
   useEffect(() => {
     const fetchComprobante = async () => {
@@ -35,7 +37,7 @@ const ComprobanteDetail = () => {
           data.result[0].files &&
           data.result[0].files.length > 0
         ) {
-          setImageUrl(data.result[0].files[0]);
+          setImageUrls(data.result[0].files); // Guardar todas las URLs en el estado
         }
       } catch (error) {
         console.error("Error al obtener los comprobantes:", error);
@@ -80,12 +82,34 @@ const ComprobanteDetail = () => {
     );
   }
 
+  // Determinar el número de columnas basado en el ancho de pantalla
+  const numColumns = width < 600 ? 1 : 3;
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>COMPROBANTES</Text>
-      <Text style={styles.label}>Comprobante subido:</Text>
-      {imageUrl ? (
-        <Image source={{ uri: imageUrl }} style={styles.image} />
+      <Text style={styles.label}>Comprobantes subidos:</Text>
+      {imageUrls.length > 0 ? (
+        <FlatList
+          data={imageUrls}
+          keyExtractor={(item, index) => index.toString()}
+          renderItem={({ item }) => (
+            <Image
+              source={{ uri: item }}
+              style={[
+                styles.image,
+                {
+                  width: width / numColumns - 20, // Espacio proporcional según columnas
+                  height: width / numColumns - 20, // Mantener proporción cuadrada
+                },
+              ]}
+            />
+          )}
+          horizontal={numColumns === 1} // Carrusel en pantallas pequeñas
+          numColumns={numColumns} // Cuadrícula en pantallas grandes
+          key={numColumns.toString()} // Forzar renderizado al cambiar columnas
+          showsHorizontalScrollIndicator={false}
+        />
       ) : (
         <Text style={styles.errorText}>
           No se encontró ninguna imagen de comprobante.
@@ -115,41 +139,40 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: "#ece2d9", // Color de fondo para consistencia
+    backgroundColor: "#ece2d9",
     alignItems: "center",
+    justifyContent: "space-between",
   },
   title: {
     fontSize: 24,
     fontWeight: "bold",
     marginBottom: 20,
-    color: "#262626", // Texto oscuro para destacar
+    color: "#262626",
   },
   label: {
     fontSize: 16,
     marginBottom: 10,
-    color: "#262626", // Texto oscuro
+    color: "#262626",
   },
   image: {
-    width: 300,
-    height: 300,
-    borderRadius: 15, // Bordes más redondeados
-    marginBottom: 20,
+    borderRadius: 15,
+    margin: 10,
     borderColor: "#BF0413",
-    borderWidth: 2, // Borde para que la imagen resalte
+    borderWidth: 2,
+    resizeMode: "contain", // Asegura que se ajusten manteniendo proporciones
   },
   errorText: {
-    color: "#BF0413", // Rojo para mensajes de error
+    color: "#BF0413",
     fontSize: 16,
     marginBottom: 20,
   },
   buttonContainer: {
     flexDirection: "row",
-    justifyContent: "space-around",
-    width: "80%",
-    marginTop: 20,
+    justifyContent: "center",
+    marginTop: 30,
   },
   verifyButton: {
-    backgroundColor: "#BF0413", // Rojo para el botón de verificar
+    backgroundColor: "#BF0413",
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 50,
@@ -157,14 +180,14 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   closeButton: {
-    backgroundColor: "#BF0413", // Botón negro para cerrar
+    backgroundColor: "#BF0413",
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 50,
     alignItems: "center",
   },
   buttonText: {
-    color: "#f2f2f2", // Texto blanco en los botones
+    color: "#f2f2f2",
     fontSize: 16,
     fontWeight: "700",
   },
