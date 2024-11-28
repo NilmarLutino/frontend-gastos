@@ -1,13 +1,22 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, StyleSheet, FlatList, ActivityIndicator, Alert } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  FlatList,
+  ActivityIndicator,
+  Alert,
+} from "react-native";
 import { useLocalSearchParams } from "expo-router";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { API_BASE_URL } from "../../services/apiConfig";
 
 type ReportType = "Evento" | "Usuario";
 
 export default function ReportView() {
-  const { reportType, eventoId, fechaInicio, fechaFin } = useLocalSearchParams();
+  const { reportType, eventoId, fechaInicio, fechaFin } =
+    useLocalSearchParams();
   const [data, setData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -49,7 +58,7 @@ export default function ReportView() {
           }
 
           const response = await axios.get(
-            `http://localhost:3000/api/reportes/usuario/${userId}`,
+            `${API_BASE_URL}/api/reportes/usuario/${userId}`,
             { params: { fechaInicio, fechaFin } }
           );
           console.log("Respuesta de usuarios:", response.data);
@@ -60,7 +69,9 @@ export default function ReportView() {
               id: index + 1,
               nombreUsuario: item.nombre_usuario,
               nombreEvento: item.nombre_evento,
-              fechaCreacion: item.fecha_creacion ? item.fecha_creacion.split(" ")[0] : "N/A", // Extraer solo la fecha
+              fechaCreacion: item.fecha_creacion
+                ? item.fecha_creacion.split(" ")[0]
+                : "N/A", // Extraer solo la fecha
               gasto: item.gasto || "Sin datos",
               fechaPago: item.fecha_pago || "N/A",
               pagado: item.pagado,
@@ -73,7 +84,9 @@ export default function ReportView() {
         } else if (isEventoReport) {
           console.log("Cargando reporte de eventos...");
 
-          const response = await axios.get(`http://localhost:3000/api/reportes/evento/${eventoId}`);
+          const response = await axios.get(
+            `${API_BASE_URL}/api/reportes/evento/${eventoId}`
+          );
           console.log("Respuesta de eventos:", response.data);
 
           const detalles = response?.data?.result?.result?.detalles;
@@ -81,12 +94,17 @@ export default function ReportView() {
             const eventDetails = detalles.map((item: any) => ({
               nombreUsuario: item.nombre_usuario,
               totalGasto: item.total_gasto,
-              gastosDetalles: item.gastos.length > 0
-                ? item.gastos.map((g: any) => `${g.descripcion}: ${g.monto}`).join(", ")
-                : "Sin detalles",
-              fechaPago: item.pagos.length > 0 ? item.pagos[0].fecha_pago : "N/A",
+              gastosDetalles:
+                item.gastos.length > 0
+                  ? item.gastos
+                      .map((g: any) => `${g.descripcion}: ${g.monto}`)
+                      .join(", ")
+                  : "Sin detalles",
+              fechaPago:
+                item.pagos.length > 0 ? item.pagos[0].fecha_pago : "N/A",
               pagado: item.ha_pagado,
-              comprobantes: item.pagos.length > 0 ? item.pagos[0].comprobantes : [],
+              comprobantes:
+                item.pagos.length > 0 ? item.pagos[0].comprobantes : [],
             }));
             setData(eventDetails);
           } else {
@@ -120,9 +138,14 @@ export default function ReportView() {
             <Text style={styles.headerCell}>
               {isEventoReport ? "Nombre Usuario" : "Nombre Evento"}
             </Text>
-            {isUsuarioReport && <Text style={styles.headerCell}>Fecha de Creación</Text>} {/* Nueva columna */}
+            {isUsuarioReport && (
+              <Text style={styles.headerCell}>Fecha de Creación</Text>
+            )}{" "}
+            {/* Nueva columna */}
             <Text style={styles.headerCell}>Gasto</Text>
-            {isEventoReport && <Text style={styles.headerCell}>Gastos Detalles</Text>}
+            {isEventoReport && (
+              <Text style={styles.headerCell}>Gastos Detalles</Text>
+            )}
             <Text style={styles.headerCell}>Fecha de Pago</Text>
             <Text style={styles.headerCell}>Pagado</Text>
             <Text style={styles.headerCell}>Comprobante</Text>
@@ -131,19 +154,28 @@ export default function ReportView() {
             data={data}
             keyExtractor={(_, index) => index.toString()}
             renderItem={({ item, index }) => (
-              <View style={[styles.tableRow, index % 2 === 0 && styles.rowEven]}>
+              <View
+                style={[styles.tableRow, index % 2 === 0 && styles.rowEven]}
+              >
                 <Text style={styles.cell}>{index + 1}</Text>
-                <Text style={styles.cell}>{isEventoReport ? item.nombreUsuario : item.nombreEvento}</Text>
+                <Text style={styles.cell}>
+                  {isEventoReport ? item.nombreUsuario : item.nombreEvento}
+                </Text>
                 {isUsuarioReport && (
-                  <Text style={styles.cell}>{item.fechaCreacion}</Text> /* Datos para la columna */
+                  <Text style={styles.cell}>
+                    {item.fechaCreacion}
+                  </Text> /* Datos para la columna */
                 )}
                 <Text style={styles.cell}>{item.gasto || item.totalGasto}</Text>
-                {isEventoReport && <Text style={styles.cell}>{item.gastosDetalles}</Text>}
+                {isEventoReport && (
+                  <Text style={styles.cell}>{item.gastosDetalles}</Text>
+                )}
                 <Text style={styles.cell}>{item.fechaPago}</Text>
                 <Text style={styles.cell}>{item.pagado ? "✔" : "✘"}</Text>
                 <Text
                   style={[styles.cell, styles.link]}
-                  onPress={() => console.log("Abrir comprobante", item.comprobantes)
+                  onPress={() =>
+                    console.log("Abrir comprobante", item.comprobantes)
                   }
                 >
                   Ver Comprobante
