@@ -77,41 +77,55 @@ export default function GroupDetails({ groupData, members, onRefresh, groupId, p
 
       
 
-      {/* Mostrar botones solo si el usuario es "Invitado" */}
-      {userRole === "Invitado" && (
-        <>
-          <TouchableOpacity
-            onPress={() =>
-              router.push({
-                pathname: "../(user)/SubirComprobante",
-                params: {
-                  eventoId: groupId,
-                  participanteId: participanteId,
-                },
-              })
-            }
-            style={styles.button}
-          >
-            <Text style={styles.buttonText}>Añadir Comprobante</Text>
-          </TouchableOpacity>
+    {userRole === "Invitado" && (
+      <View style={{ flexDirection: "row", justifyContent: "space-between", marginVertical: 10 }}>
+        <TouchableOpacity
+          onPress={() =>
+            router.push({
+              pathname: "../(user)/SubirComprobante",
+              params: {
+                eventoId: groupId,
+                participanteId: participanteId,
+              },
+            })
+          }
+          style={[styles.button, { flex: 1, marginRight: 5 }]} // Espaciado entre botones
+        >
+          <Text style={styles.buttonText}>Añadir Comprobante</Text>
+        </TouchableOpacity>
 
-          <TouchableOpacity
-            onPress={() =>
-              router.push({
-                pathname: "../(user)/ComprobanteDetail",
-                params: {
-                  eventoId: groupId,
-                  participanteId: participanteId,
-                  userRole: "Invitado",
-                },
-              })
-            }
-            style={styles.button}
-          >
-            <Text style={styles.buttonText}>Ver Comprobante subido</Text>
-          </TouchableOpacity>
-        </>
-      )}
+        <TouchableOpacity
+          onPress={() =>
+            router.push({
+              pathname: "../(user)/ComprobanteDetail",
+              params: {
+                eventoId: groupId,
+                participanteId: participanteId,
+                userRole: "Invitado",
+              },
+            })
+          }
+          style={[styles.button, { flex: 1, marginHorizontal: 5 }]} // Espaciado uniforme
+        >
+          <Text style={styles.buttonText}>Ver Comprobante</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          onPress={() =>
+            router.push({
+              pathname: "../(user)/ReportView",
+              params: {
+                eventoId: groupId,
+                reportType: "Evento",
+              },
+            })
+          }
+          style={[styles.button, { flex: 1, marginLeft: 5 }]} // Espaciado entre botones
+        >
+          <Text style={styles.buttonText}>Ver Reporte</Text>
+        </TouchableOpacity>
+      </View>
+    )}
 
 
 
