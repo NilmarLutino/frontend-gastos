@@ -2,11 +2,12 @@ import React, { useState, useEffect } from "react";
 import { View, Text, StyleSheet, FlatList, ActivityIndicator, Alert, TouchableOpacity } from "react-native";
 import { useLocalSearchParams } from "expo-router";
 import { useRouter } from "expo-router";
-
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { jsPDF } from "jspdf";
 import { API_BASE_URL } from "../../services/apiConfig";
+import * as Sharing from 'expo-sharing';
+import * as FileSystem from 'expo-file-system';
+import * as XLSX from 'xlsx';
 
 type ReportType = "Evento" | "Usuario";
 
@@ -29,15 +30,37 @@ export default function ReportView() {
     }
   };
 
-
   const handleDownloadReport = async () => {
     try {
-      // Aquí iría la lógica para descargar el reporte
-      console.log("Descargando reporte...");
-      Alert.alert("Reporte descargado", "El reporte se descargó correctamente.");
+      // 1. Filtrar los datos y eliminar la columna de "Comprobantes"
+      const filteredData = data.map((item) => {
+        const { Comprobantes, ...rest } = item; // Eliminar la propiedad Comprobantes
+        return rest;
+      });
+  
+      // 2. Crear una hoja de Excel
+      const ws = XLSX.utils.json_to_sheet(filteredData);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "Reporte");
+  
+      // 3. Generar un archivo Excel en formato binario
+      const excelData = XLSX.write(wb, { bookType: "xlsx", type: "base64" });
+  
+      // 4. Guardar el archivo en el sistema de archivos
+      const filePath = FileSystem.documentDirectory + "reporte.xlsx";
+      await FileSystem.writeAsStringAsync(filePath, excelData, {
+        encoding: FileSystem.EncodingType.Base64,
+      });
+  
+      // 5. Compartir el archivo directamente usando expo-sharing
+      if (await Sharing.isAvailableAsync()) {
+        await Sharing.shareAsync(filePath);
+      } else {
+        Alert.alert("Error", "No se pudo compartir el archivo");
+      }
     } catch (error) {
-      console.error("Error al descargar el reporte:", error);
-      Alert.alert("Error", "Hubo un problema al descargar el reporte.");
+      console.error("Error al generar el reporte:", error);
+      Alert.alert("Error", "No se pudo generar el reporte");
     }
   };
 
