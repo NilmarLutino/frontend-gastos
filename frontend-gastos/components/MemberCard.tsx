@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-
 import {
   View,
   Text,
@@ -12,9 +11,11 @@ import { FontAwesome } from "@expo/vector-icons";
 import AddExpenses from "./modals/addExpenses";
 import DeleteExpenses from "./modals/deleteExpenses";
 import DeleteMember from "./modals/deleteMember";
+import WarningModal from "./modals/warningModal"; // Importar el modal de advertencia
 import { createExpense, fetchParticipantById } from "../services/eventService";
 import { useRouter } from "expo-router";
 import { API_BASE_URL } from "../services/apiConfig";
+
 type Expense = {
   id: number;
   item: string;
@@ -101,7 +102,7 @@ export default function MemberCard({
         Alert.alert("Error", "No se ha seleccionado un gasto para eliminar.");
         return;
       }
-  
+
       // Realiza la solicitud DELETE al endpoint
       const response = await fetch(
         `${API_BASE_URL}/api/gastos/${selectedExpense.id}`,
@@ -112,7 +113,7 @@ export default function MemberCard({
           },
         }
       );
-  
+
       if (response.ok) {
         setDeleteExpenseVisible(false);
         onRefresh(); // Refresca los datos después de eliminar el gasto
@@ -127,7 +128,8 @@ export default function MemberCard({
       Alert.alert("Error", "Hubo un problema al eliminar el gasto.");
     }
   };
-  
+
+  const [isWarningVisible, setWarningVisible] = useState(false);
 
   const handleDeleteMember = async () => {
     try {
@@ -160,22 +162,19 @@ export default function MemberCard({
   };  
 
   return (
-    
     <View style={styles.card}>
-      {userRole === "Propietario" && rolesId !== 3  && (
-      <TouchableOpacity
-        style={styles.delete_member}
-        onPress={() => {
-          setSelectedMember(member);
-          console.log("miembro seleccionado", member);
-          setDeleteMemberVisible(true)
-        }}
-      >
-        <FontAwesome name="trash" size={20} color="#BF0413" />
-      </TouchableOpacity>
-    )}
+      {userRole === "Propietario" && rolesId !== 3 && (
+        <TouchableOpacity
+          style={styles.delete_member}
+          onPress={() => {
+            setSelectedMember(member);
+            setDeleteMemberVisible(true);
+          }}
+        >
+          <FontAwesome name="trash" size={20} color="#BF0413" />
+        </TouchableOpacity>
+      )}
 
-      
       <TouchableOpacity style={styles.header} onPress={toggleExpand}>
         <Text style={styles.memberName}>{member.name}</Text>
         <Text style={styles.balance}>{member.balance.toFixed(2)} Bs.</Text>
@@ -188,17 +187,18 @@ export default function MemberCard({
             renderItem={({ item }) => (
               <View style={styles.expenseItem}>
                 <Text style={styles.expenseText}>{item.item}</Text>
-                <Text style={styles.expenseText}>{item.amount.toFixed(2)} Bs.</Text>
+                <Text style={styles.expenseText}>
+                  {item.amount.toFixed(2)} Bs.
+                </Text>
                 <TouchableOpacity
-  style={styles.delete_expense}
-  onPress={() => {
-    setSelectedExpense(item); // Establece el gasto seleccionado
-    setDeleteExpenseVisible(true); // Muestra el modal de confirmación
-  }}
->
-  <FontAwesome name="trash" size={20} color="#BF0413" />
-</TouchableOpacity>
-
+                  style={styles.delete_expense}
+                  onPress={() => {
+                    setSelectedExpense(item); // Establece el gasto seleccionado
+                    setDeleteExpenseVisible(true); // Muestra el modal de confirmación
+                  }}
+                >
+                  <FontAwesome name="trash" size={20} color="#BF0413" />
+                </TouchableOpacity>
               </View>
             )}
             keyExtractor={(item, index) => index.toString()}
@@ -255,13 +255,18 @@ export default function MemberCard({
         message={`¿Estás seguro de que deseas eliminar el gasto "${selectedExpense?.item}"?`}
       />
 
-
       {/* Modal para confirmar eliminación de miembro */}
       <DeleteMember
         visible={isDeleteMemberVisible}
         onClose={() => setDeleteMemberVisible(false)}
         onConfirm={handleDeleteMember}
         message={`¿Estás seguro de que deseas eliminar a ${member.name}?`}
+      />
+
+      <WarningModal
+        visible={isWarningVisible}
+        onClose={() => setWarningVisible(false)}
+        message="No puedes eliminar este miembro porque tiene gastos registrados."
       />
     </View>
   );
