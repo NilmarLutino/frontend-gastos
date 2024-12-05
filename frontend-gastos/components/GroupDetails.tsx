@@ -79,6 +79,25 @@ export default function GroupDetails({
           <TouchableOpacity
             onPress={() =>
               router.push({
+                pathname: "../(user)/SubirFactura",
+                params: {
+                  groupId: groupId,
+                  participanteIds: members
+                    .map((member) => member.id)
+                    .join(","),
+                  participanteNombres: members
+                    .map((member) => member.name)
+                    .join(","),
+                },
+              })
+            }
+            style={[styles.button, { flex: 1, marginRight: 5 }]}
+          >
+            <Text style={styles.buttonText}>Importar Factura</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() =>
+              router.push({
                 pathname: "../(user)/ComprobantesList",
                 params: {
                   groupId: groupId,
