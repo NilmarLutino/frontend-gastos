@@ -24,7 +24,7 @@ type GroupDetailsProps = {
     id: string;
     name: string;
     balance: number;
-    expenses: { item: string; amount: number }[];
+    expenses: { id: number; item: string; amount: number }[];
   }[];
   onRefresh: () => void;
   groupId: string;

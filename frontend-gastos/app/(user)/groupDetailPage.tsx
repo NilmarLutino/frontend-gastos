@@ -28,7 +28,7 @@ type GroupData = {
     id: string;
     name: string;
     balance: number;
-    expenses: { item: string; amount: number }[];
+    expenses: { id:number; item: string; amount: number }[];
   }[];
 };
 
@@ -92,6 +92,7 @@ export default function GroupDetailPage() {
             name: participant.nombre_usuario,
             balance,
             expenses: expenses.map((expense: any) => ({
+              id: expense.gasto_id,
               item: expense.descripcion_gasto,
               amount: parseFloat(expense.monto_gasto),
             })),
