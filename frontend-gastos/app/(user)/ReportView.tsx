@@ -32,27 +32,44 @@ export default function ReportView() {
 
   const handleDownloadReport = async () => {
     try {
-      // 1. Filtrar los datos y eliminar la columna de "Comprobantes"
-      const filteredData = data.map((item) => {
-        const { Comprobantes, ...rest } = item; // Eliminar la propiedad Comprobantes
-        return rest;
-      });
+      // 1. Construir manualmente el conjunto de datos formateado para el Excel
+      const formattedData = data.map((item, index) => ({
+        Numero: index + 1, // Generar una columna "Numero" incremental
+        NombreUsuario: item.nombreUsuario || "N/A",
+        TotalGasto: item.totalGasto || 0,
+        GastosDetalles: item.gastosDetalles || "Sin detalles",
+        FechaPago: item.fechaPago || "N/A",
+        Pagado: item.pagado ? "Si" : "No", 
+      }));
   
-      // 2. Crear una hoja de Excel
-      const ws = XLSX.utils.json_to_sheet(filteredData);
+      // 2. Crear encabezados personalizados basados en las columnas generadas
+      const headers = [
+        "Numero",
+        "NombreUsuario",
+        "TotalGasto",
+        "GastosDetalles",
+        "FechaPago",
+        "Pagado",
+      ];
+  
+      // 3. Crear una hoja de Excel
+      const ws = XLSX.utils.json_to_sheet([]);
+      XLSX.utils.sheet_add_aoa(ws, [headers], { origin: "A1" }); // Agregar encabezados manualmente
+      XLSX.utils.sheet_add_json(ws, formattedData, { skipHeader: true, origin: "A2" }); // Agregar datos bajo los encabezados
+  
       const wb = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(wb, ws, "Reporte");
   
-      // 3. Generar un archivo Excel en formato binario
+      // 4. Generar un archivo Excel en formato binario
       const excelData = XLSX.write(wb, { bookType: "xlsx", type: "base64" });
   
-      // 4. Guardar el archivo en el sistema de archivos
+      // 5. Guardar el archivo en el sistema de archivos
       const filePath = FileSystem.documentDirectory + "reporte.xlsx";
       await FileSystem.writeAsStringAsync(filePath, excelData, {
         encoding: FileSystem.EncodingType.Base64,
       });
   
-      // 5. Compartir el archivo directamente usando expo-sharing
+      // 6. Compartir el archivo directamente usando expo-sharing
       if (await Sharing.isAvailableAsync()) {
         await Sharing.shareAsync(filePath);
       } else {
@@ -63,6 +80,9 @@ export default function ReportView() {
       Alert.alert("Error", "No se pudo generar el reporte");
     }
   };
+  
+  
+  
 
   console.log("Parámetros recibidos:");
   console.log("reportType:", reportType);
@@ -213,15 +233,21 @@ export default function ReportView() {
                 <Text style={styles.cell}>{item.pagado ? "✔" : "✘"}</Text>
                 <Text
                   style={[styles.cell, styles.link]}
-                  onPress={() =>
-                    router.push({
-                      pathname: "../(user)/ComprobanteDetail",
-                      params: { eventoId: eventoId, participanteId: item.numero , userRole: "Invitado" },
-                      
-                    })
-                  }
+                  onPress={() => {
+                    if (item.pagado) {
+                      // Solo se permite redirigir si el pago está realizado
+                      router.push({
+                        pathname: "../(user)/ComprobanteDetail",
+                        params: { 
+                          eventoId: eventoId, 
+                          participanteId: item.numero, 
+                          userRole: "Invitado" 
+                        },
+                      });
+                    }
+                  }}
                 >
-                  Ver Comprobantes
+                  {item.pagado ? "Ver Comprobantes" : ""} 
                 </Text>
               </View>
             )}
