@@ -131,18 +131,33 @@ export default function MemberCard({
 
   const handleDeleteMember = async () => {
     try {
-      if (!selectedMember) return;
-
-      // Aquí deberías llamar a tu API para eliminar el miembro seleccionado
-      console.log(`Eliminando miembro: ${member.name}`);
-      setDeleteMemberVisible(false);
-      onRefresh();
-      Alert.alert("Éxito", "Miembro eliminado correctamente");
+      if (!selectedMember) {
+        Alert.alert("Error", "No se ha seleccionado un miembro para eliminar.");
+        return;
+      }
+      const response = await fetch(
+        `${API_BASE_URL}/api/participantes/${selectedMember.id}`,
+        {
+          method: "DELETE",
+          headers: {
+            Accept: "application/json",
+          },
+        }
+      );
+      if (response.ok) {
+        setDeleteMemberVisible(false);
+        onRefresh();
+        Alert.alert("Éxito", "Miembro eliminado correctamente");
+      } else {
+        const errorData = await response.json();
+        console.error("Error al eliminar miembro:", errorData);
+        Alert.alert("Error", "Hubo un problema al eliminar el miembro.");
+      }
     } catch (error) {
       console.error("Error al eliminar miembro:", error);
       Alert.alert("Error", "Hubo un problema al eliminar el miembro.");
     }
-  };
+  };  
 
   return (
     
@@ -152,6 +167,7 @@ export default function MemberCard({
         style={styles.delete_member}
         onPress={() => {
           setSelectedMember(member);
+          console.log("miembro seleccionado", member);
           setDeleteMemberVisible(true)
         }}
       >
@@ -233,11 +249,11 @@ export default function MemberCard({
 
       {/* Modal para confirmar eliminación de gasto */}
       <DeleteExpenses
-  visible={isDeleteExpenseVisible}
-  onClose={() => setDeleteExpenseVisible(false)}
-  onConfirm={handleDeleteExpense} // Llama a la función de eliminación
-  message={`¿Estás seguro de que deseas eliminar el gasto "${selectedExpense?.item}"?`}
-/>
+        visible={isDeleteExpenseVisible}
+        onClose={() => setDeleteExpenseVisible(false)}
+        onConfirm={handleDeleteExpense} // Llama a la función de eliminación
+        message={`¿Estás seguro de que deseas eliminar el gasto "${selectedExpense?.item}"?`}
+      />
 
 
       {/* Modal para confirmar eliminación de miembro */}
