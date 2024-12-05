@@ -82,12 +82,6 @@ export default function GroupDetails({
                 pathname: "../(user)/SubirFactura",
                 params: {
                   groupId: groupId,
-                  participanteIds: members
-                    .map((member) => member.id)
-                    .join(","),
-                  participanteNombres: members
-                    .map((member) => member.name)
-                    .join(","),
                 },
               })
             }

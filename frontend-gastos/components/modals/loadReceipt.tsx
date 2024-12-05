@@ -6,6 +6,7 @@ interface LoadReceiptProps {
   onClose: () => void;
   onSplitEqually: () => void;
   onAssignIndividually: () => void;
+  receiptData: any | null; // Nueva prop para los datos dinámicos
 }
 
 const LoadReceipt: React.FC<LoadReceiptProps> = ({
@@ -13,40 +14,26 @@ const LoadReceipt: React.FC<LoadReceiptProps> = ({
   onClose,
   onSplitEqually,
   onAssignIndividually,
+  receiptData,
 }) => {
-  const dummyReceiptData = {
-    mensaje: "Factura procesada exitosamente",
-    datos: {
-      items: [
-        {
-          description: "CREMA GEL LIGERA 5KIN 1004",
-          quantity: 1,
-          unit_price: 248,
-          subtotal: 248,
-        },
-        {
-          description: "URIAGE HYSEAC PROTECTOR SOLAR SPF50 50ML",
-          quantity: 1,
-          unit_price: 275,
-          subtotal: 275,
-        },
-      ],
-      total: 523,
-    },
-  };
-
   return (
     <Modal visible={visible} animationType="slide" transparent={true}>
       <View style={styles.modalContainer}>
         <View style={styles.modalContent}>
           <Text style={styles.title}>Factura</Text>
-          <Text style={styles.message}>{dummyReceiptData.mensaje}</Text>
-          {dummyReceiptData.datos.items.map((item, index) => (
-            <Text key={index} style={styles.itemText}>
-              {item.quantity}x {item.description} - ${item.subtotal}
-            </Text>
-          ))}
-          <Text style={styles.totalText}>Total: ${dummyReceiptData.datos.total}</Text>
+          {receiptData ? (
+            <>
+              <Text style={styles.message}>{receiptData.mensaje}</Text>
+              {receiptData.datos.items.map((item: any, index: number) => (
+                <Text key={index} style={styles.itemText}>
+                  {item.quantity}x {item.description} - ${item.subtotal}
+                </Text>
+              ))}
+              <Text style={styles.totalText}>Total: ${receiptData.datos.total}</Text>
+            </>
+          ) : (
+            <Text style={styles.message}>Cargando datos...</Text>
+          )}
           <View style={styles.buttonContainer}>
             <TouchableOpacity
               style={[styles.button, styles.splitButton]}

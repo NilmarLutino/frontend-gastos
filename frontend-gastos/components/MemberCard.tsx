@@ -79,6 +79,8 @@ export default function MemberCard({
       const participantDetails = await fetchParticipantById(member.id);
       const usuarioId = participantDetails.usuario_id;
 
+      console.log("PArticipante id", usuarioId);
+
       await createExpense(
         parseInt(groupId),
         parseFloat(monto),
