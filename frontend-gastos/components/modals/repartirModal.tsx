@@ -9,6 +9,7 @@ import {
   Alert,
 } from "react-native";
 import axios from "axios";
+import { API_BASE_URL } from "../../services/apiConfig";
 
 interface ModalRepartirProps {
   visible: boolean;
@@ -47,7 +48,7 @@ const ModalRepartir: React.FC<ModalRepartirProps> = ({
 
     try {
       const response = await axios.put(
-        `http://localhost:3000/api/eventos/distribute/${groupId}`,
+        `${API_BASE_URL}/api/eventos/distribute/${groupId}`,
         {
           totalGasto: Number(totalAmount),
           descripcionGasto: description.trim(),
