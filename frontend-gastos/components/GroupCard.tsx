@@ -68,7 +68,7 @@ export default function GroupCard({
         Integrantes: <Text style={styles.ammo}>{members}</Text>
       </Text>
       <Text style={styles.details}>
-        Gastos totales: <Text style={styles.ammo}>{expenses} Bs.</Text>
+        Gastos totales: <Text style={styles.ammo}>{expenses.toFixed(2)} Bs.</Text>
       </Text>
       <Text style={styles.details}>
         Pagados: <Text style={styles.ammo}>{paid}</Text>

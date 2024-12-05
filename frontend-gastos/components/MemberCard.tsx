@@ -119,7 +119,7 @@ export default function MemberCard({
       </TouchableOpacity>
       <TouchableOpacity style={styles.header} onPress={toggleExpand}>
         <Text style={styles.memberName}>{member.name}</Text>
-        <Text style={styles.balance}>{member.balance} Bs.</Text>
+        <Text style={styles.balance}>{member.balance.toFixed(2)} Bs.</Text>
       </TouchableOpacity>
 
       {isExpanded && (
@@ -129,7 +129,7 @@ export default function MemberCard({
             renderItem={({ item }) => (
               <View style={styles.expenseItem}>
                 <Text style={styles.expenseText}>{item.item}</Text>
-                <Text style={styles.expenseText}>{item.amount} Bs.</Text>
+                <Text style={styles.expenseText}>{item.amount.toFixed(2)} Bs.</Text>
                 <TouchableOpacity
                   style={styles.delete_expense}
                   onPress={() => {
