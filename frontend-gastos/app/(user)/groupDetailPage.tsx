@@ -28,7 +28,7 @@ type GroupData = {
     id: string;
     name: string;
     balance: number;
-    expenses: { id:number; item: string; amount: number }[];
+    expenses: { id: number; item: string; amount: number }[];
   }[];
 };
 
@@ -83,22 +83,25 @@ export default function GroupDetailPage() {
           );
           const balance = expenses.reduce(
             (total: number, expense: any) =>
-              total + parseFloat(expense.monto_gasto),
+              total + parseFloat(expense.monto_gasto || "0"), 
             0
           );
-
+      
           return {
             id: participant.participante_id.toString(),
             name: participant.nombre_usuario,
             balance,
-            expenses: expenses.map((expense: any) => ({
-              id: expense.gasto_id,
-              item: expense.descripcion_gasto,
-              amount: parseFloat(expense.monto_gasto),
-            })),
+            expenses: expenses.map((expense: any) => {
+              console.log("Expense recibido:", expense); 
+              return {
+                id: expense.gasto_id ? parseInt(expense.gasto_id, 10) : null, 
+                item: expense.descripcion_gasto || "Sin descripción", 
+                amount: parseFloat(expense.monto_gasto || "0"), 
+              };
+            }),
           };
         })
-      );
+      );      
 
       const totalExpenses = members.reduce(
         (total, member) => total + member.balance,

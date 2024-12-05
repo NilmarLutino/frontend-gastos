@@ -155,8 +155,9 @@ export const fetchEventParticipantExpenses = async (
         `Error fetching expenses for participant ID: ${participantId} and event ID: ${groupId}`
       );
     }
-
+    
     const json = await response.json();
+    console.log("Gastos recibidos:", json.result);
     return json.result; // Retorna la lista de gastos
   } catch (error) {
     console.error(

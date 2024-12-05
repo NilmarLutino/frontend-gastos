@@ -62,7 +62,7 @@ export default function GroupDetails({
       <Text style={styles.groupTitle}>{groupData.groupName}</Text>
       <Text style={styles.details}>Integrantes: {groupData.membersCount}</Text>
       <Text style={styles.details}>
-        Gastos totales: {groupData.totalExpenses}$
+        Gastos totales: {groupData.totalExpenses.toFixed(2)} Bs.
       </Text>
       <Text style={styles.details}>Pagados: {groupData.paidCount}</Text>
       <Text style={styles.details}>Descripción: {groupData.description}</Text>

@@ -132,37 +132,49 @@ export default function MemberCard({
   const [isWarningVisible, setWarningVisible] = useState(false);
 
   const handleDeleteMember = async () => {
-    if (member.expenses.length > 0) {
-      // Si el miembro tiene gastos, mostrar el modal de advertencia
-      setWarningVisible(true);
-    } else {
-      try {
-        if (!selectedMember) return;
-
-        console.log(`Eliminando miembro: ${member.name}`);
+    try {
+      if (!selectedMember) {
+        Alert.alert("Error", "No se ha seleccionado un miembro para eliminar.");
+        return;
+      }
+      const response = await fetch(
+        `${API_BASE_URL}/api/participantes/${selectedMember.id}`,
+        {
+          method: "DELETE",
+          headers: {
+            Accept: "application/json",
+          },
+        }
+      );
+      if (response.ok) {
         setDeleteMemberVisible(false);
         onRefresh();
         Alert.alert("Éxito", "Miembro eliminado correctamente");
-      } catch (error) {
-        console.error("Error al eliminar miembro:", error);
+      } else {
+        const errorData = await response.json();
+        console.error("Error al eliminar miembro:", errorData);
         Alert.alert("Error", "Hubo un problema al eliminar el miembro.");
       }
+    } catch (error) {
+      console.error("Error al eliminar miembro:", error);
+      Alert.alert("Error", "Hubo un problema al eliminar el miembro.");
     }
-  };
+  };  
 
   return (
     <View style={styles.card}>
-      {userRole === "Propietario" && rolesId !== 3 && (
-        <TouchableOpacity
-          style={styles.delete_member}
-          onPress={() => {
-            setSelectedMember(member);
-            setDeleteMemberVisible(true);
-          }}
-        >
-          <FontAwesome name="trash" size={20} color="#BF0413" />
-        </TouchableOpacity>
-      )}
+      {userRole === "Propietario" && rolesId !== 3  && (
+      <TouchableOpacity
+        style={styles.delete_member}
+        onPress={() => {
+          setSelectedMember(member);
+          console.log("miembro seleccionado", member);
+          setDeleteMemberVisible(true)
+        }}
+      >
+        <FontAwesome name="trash" size={20} color="#BF0413" />
+      </TouchableOpacity>
+    )}
 
       <TouchableOpacity style={styles.header} onPress={toggleExpand}>
         <Text style={styles.memberName}>{member.name}</Text>
