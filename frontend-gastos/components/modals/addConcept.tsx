@@ -1,35 +1,81 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, Modal, StyleSheet, TouchableOpacity } from "react-native";
+import { View, Text, TextInput, Modal, StyleSheet, TouchableOpacity, Alert } from "react-native";
+import { API_BASE_URL } from "../../services/apiConfig";
 
 interface AddConceptProps {
   visible: boolean;
   onClose: () => void;
-  onRepartir: (concepto: string) => void; // Callback para repartir los gastos
+  onRepartir: () => void; // Callback para manejar la acción de repartir
+  groupId: string; // El ID del grupo recibido
+  totalAmount: number; // El total de la factura recibido
 }
 
-const AddConcepts: React.FC<AddConceptProps> = ({ visible, onClose, onRepartir }) => {
+const AddConcepts: React.FC<AddConceptProps> = ({
+  visible,
+  onClose,
+  onRepartir,
+  groupId,
+  totalAmount,
+}) => {
   const [concepto, setConcepto] = useState("");
+
+  const handleRepartir = async () => {
+    if (!concepto.trim()) {
+      Alert.alert("Advertencia", "Por favor, ingresa un concepto válido.");
+      return;
+    }
+  
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/eventos/distribute/${groupId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify({
+          totalGasto: Number(totalAmount),
+          descripcionGasto: concepto.trim(),
+        }),
+      });
+  
+      if (response.ok) {
+        Alert.alert("Éxito", "El gasto se ha distribuido correctamente.");
+        await onRepartir(); // Recarga los datos tras la operación
+        onClose(); // Cierra el modal
+      } else {
+        const errorText = await response.text(); // Leer texto de error del servidor
+        console.error("Error en la respuesta:", errorText);
+        Alert.alert("Error", "No se pudo realizar la operación. Inténtalo nuevamente.");
+      }
+    } catch (error) {
+      console.error("Error al repartir gastos:", error);
+      Alert.alert("Error", "Ocurrió un error al repartir los gastos. Por favor, intenta nuevamente.");
+    }
+  };
+  
 
   return (
     <Modal visible={visible} animationType="slide" transparent={true}>
       <View style={styles.modalContainer}>
         <View style={styles.modalContent}>
-          <Text style={styles.title}>AGREGAR GASTOS</Text>
-          
-          <Text>CONCEPTO</Text>
+          <Text style={styles.title}>Repartir Equitativamente</Text>
+
+          {/* Muestra el ID del grupo y el monto total */}
+          <Text style={styles.textamount}>Total: {totalAmount} Bs.</Text>
+
+          {/* Entrada para el concepto */}
+          <Text style={styles.title1}>Concepto</Text>
           <TextInput
             style={styles.input}
+            placeholder="Ej. Gastos Comida"
             value={concepto}
             onChangeText={setConcepto}
           />
-          
+
           <View style={styles.buttonContainer}>
-            {/* Botón Repartir */}
-            <TouchableOpacity style={styles.button} onPress={() => onRepartir(concepto)}>
+            <TouchableOpacity style={styles.button} onPress={handleRepartir}>
               <Text style={styles.buttonText}>Repartir</Text>
             </TouchableOpacity>
-
-            {/* Botón Cerrar */}
             <TouchableOpacity style={styles.button} onPress={onClose}>
               <Text style={styles.buttonText}>Cerrar</Text>
             </TouchableOpacity>
@@ -37,8 +83,9 @@ const AddConcepts: React.FC<AddConceptProps> = ({ visible, onClose, onRepartir }
         </View>
       </View>
     </Modal>
-  );  
+  );
 };
+
 
 const styles = StyleSheet.create({
   modalContainer: {
@@ -65,6 +112,23 @@ const styles = StyleSheet.create({
     textAlign: "center",
     color: "#262626",  // Texto oscuro
   },
+
+  title1: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 10,
+    textAlign: "center",
+    color: "#262626",  // Texto oscuro
+  },
+
+  textamount: {
+    fontSize: 15,
+    marginBottom: 10,
+    padding: 2,
+    alignSelf: "flex-start",
+    color: "#262626",  // Texto oscuro
+  },
+
   input: {
     borderColor: "#B0B0B0",  // Borde gris claro
     borderWidth: 1,
@@ -91,6 +155,11 @@ const styles = StyleSheet.create({
     color: "#fff",  // Texto blanco
     fontWeight: "bold",
     fontSize: 16,
+  },
+  label: {
+    fontSize: 16,
+    alignSelf: "flex-start",
+    marginBottom: 5,
   },
 });
 

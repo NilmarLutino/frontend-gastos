@@ -9,48 +9,88 @@ import {
   Alert,
 } from "react-native";
 import { Picker } from "@react-native-picker/picker";
-
-type InvoiceItem = {
-  description: string;
-  subtotal: number;
-};
-
-const staticData: InvoiceItem[] = [
-  { description: "CREMA GEL LIGERA 5KIN 1004", subtotal: 248 },
-  { description: "URIAGE HYSEAC PROTECTOR SOLAR SPF50 50ML", subtotal: 275 },
-];
+import { createExpense } from "../../services/eventService"; // Importa la función createExpense
 
 type InvoiceModalProps = {
   visible: boolean;
   onClose: () => void;
-  onAssign: (selectedUsers: string[]) => void;
+  onAssign: (selectedUsers: { userId: string; userName: string }[]) => void;
+  invoiceDetails: {
+    groupId: string;
+    participantes: { id: string; name: string }[];
+    items: { description: string; subtotal: number }[];
+  } | null;
 };
 
 export default function InvoiceModal({
   visible,
   onClose,
-  onAssign,
+  invoiceDetails,
 }: InvoiceModalProps) {
-  const [selectedUsers, setSelectedUsers] = useState<string[]>(
-    Array(staticData.length).fill("")
-  );
+  const [selectedUsers, setSelectedUsers] = useState<
+    { userId: string; userName: string }[]
+  >(Array(invoiceDetails?.items?.length || 0).fill({ userId: "", userName: "" }));
 
-  const users = ["Usuario 1", "Usuario 2", "Usuario 3"];
+  const handleUserChange = (index: number, userId: string) => {
+    const selectedUser = invoiceDetails?.participantes.find(
+      (user) => user.id === userId
+    );
 
-  const handleUserChange = (index: number, user: string) => {
+    if (!selectedUser) return;
+
     const updatedUsers = [...selectedUsers];
-    updatedUsers[index] = user;
+    updatedUsers[index] = { userId, userName: selectedUser.name };
     setSelectedUsers(updatedUsers);
+
+    console.log(`Item ${index} asignado a usuario:`, {
+      userId: selectedUser.id,
+      userName: selectedUser.name,
+    });
   };
 
-  const handleAssign = () => {
-    if (selectedUsers.some((user) => user === "")) {
-      Alert.alert("Error", "Por favor, selecciona un usuario para cada producto.");
+  const handleAddExpense = async (itemIndex: number) => {
+    const selectedUser = selectedUsers[itemIndex];
+    const item = invoiceDetails?.items[itemIndex];
+  
+    if (!selectedUser || !item) {
+      Alert.alert("Error", "Selecciona un usuario para este producto.");
       return;
     }
-    onAssign(selectedUsers);
-    onClose();
+  
+    try {
+      console.log("Creando gasto:", {
+        groupId: invoiceDetails.groupId,
+        concepto: item.description,
+        monto: item.subtotal,
+        usuarioId: selectedUser.userId,
+      });
+  
+      await createExpense(
+        parseInt(invoiceDetails.groupId),
+        item.subtotal,
+        "Alimentación", // Categoría predeterminada
+        item.description,
+        parseInt(selectedUser.userId)
+      );
+  
+      Alert.alert(
+        "Éxito",
+        `Gasto de "${item.description}" asignado a "${selectedUser.userName}" correctamente.`
+      );
+  
+      console.log(
+        `Gasto asignado: ${item.description} -> Usuario: ${selectedUser.userName}`
+      );
+    } catch (error) {
+      console.error("Error al crear el gasto:", error);
+      Alert.alert("Error", "Hubo un problema al agregar el gasto.");
+    }
   };
+  
+
+  if (!invoiceDetails) {
+    return null;
+  }
 
   return (
     <Modal visible={visible} animationType="slide" transparent>
@@ -58,28 +98,33 @@ export default function InvoiceModal({
         <View style={styles.modalContent}>
           <Text style={styles.title}>Detalles de la Factura</Text>
           <ScrollView style={styles.scroll}>
-            {staticData.map((item, index) => (
+            {invoiceDetails.items.map((item, index) => (
               <View key={index} style={styles.itemRow}>
-                <Text style={styles.description}>{item.description}</Text>
-                <Text style={styles.subtotal}>{item.subtotal} Bs.</Text>
+                <View style={styles.itemInfo}>
+                  <Text style={styles.description}>{item.description}</Text>
+                  <Text style={styles.subtotal}>{item.subtotal} Bs.</Text>
+                </View>
                 <Picker
-                  selectedValue={selectedUsers[index]}
+                  selectedValue={selectedUsers[index]?.userId || ""}
                   style={styles.picker}
                   onValueChange={(value) => handleUserChange(index, value)}
                 >
                   <Picker.Item label="Selecciona un usuario" value="" />
-                  {users.map((user, idx) => (
-                    <Picker.Item key={idx} label={user} value={user} />
+                  {invoiceDetails.participantes.map((user) => (
+                    <Picker.Item key={user.id} label={user.name} value={user.id} />
                   ))}
                 </Picker>
+                <TouchableOpacity
+                  style={styles.addButton}
+                  onPress={() => handleAddExpense(index)}
+                >
+                  <Text style={styles.buttonText}>Agregar Gasto</Text>
+                </TouchableOpacity>
               </View>
             ))}
           </ScrollView>
-          <View style={styles.buttonContainer}>
-            <TouchableOpacity style={styles.button} onPress={handleAssign}>
-              <Text style={styles.buttonText}>Asignar</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.button} onPress={onClose}>
+          <View style={styles.footer}>
+            <TouchableOpacity style={styles.closeButton} onPress={onClose}>
               <Text style={styles.buttonText}>Cerrar</Text>
             </TouchableOpacity>
           </View>
@@ -97,62 +142,61 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
   modalContent: {
-    width: "90%",
-    padding: 20,
-    backgroundColor: "#FDF6F0",
+    backgroundColor: "white",
     borderRadius: 10,
+    padding: 20,
+    width: "90%",
+    maxHeight: "80%",
   },
   title: {
     fontSize: 18,
     fontWeight: "bold",
     marginBottom: 20,
-    textAlign: "center",
-    color: "#262626",
   },
   scroll: {
-    maxHeight: 300,
+    flex: 1,
   },
   itemRow: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between",
-    marginVertical: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: "#ccc",
-    paddingBottom: 10,
+    marginBottom: 10,
+  },
+  itemInfo: {
+    flex: 1,
   },
   description: {
-    flex: 2,
     fontSize: 16,
-    color: "#333",
+    fontWeight: "bold",
   },
   subtotal: {
-    flex: 1,
-    fontSize: 16,
-    color: "#555",
-    textAlign: "right",
+    fontSize: 14,
+    color: "#666",
   },
   picker: {
-    flex: 1.5,
+    flex: 1,
     height: 40,
   },
-  buttonContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginTop: 20,
-  },
-  button: {
+  addButton: {
     backgroundColor: "#BF0413",
-    paddingVertical: 12,
-    paddingHorizontal: 20,
+    paddingHorizontal: 10,
+    paddingVertical: 8,
     borderRadius: 5,
-    alignItems: "center",
-    flex: 1,
-    marginHorizontal: 5,
+    marginLeft: 10,
   },
   buttonText: {
-    color: "#fff",
+    color: "#FFF",
     fontWeight: "bold",
-    fontSize: 16,
+    fontSize: 14,
+  },
+  footer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    marginTop: 20,
+  },
+  closeButton: {
+    backgroundColor: "#BF0413",
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 5,
   },
 });
