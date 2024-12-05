@@ -3,10 +3,13 @@ import { View, Text, Image, StyleSheet, TouchableOpacity, Alert } from "react-na
 import * as ImagePicker from "expo-image-picker";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import LoadReceipt from "@/components/modals/loadReceipt";
+import AddConcepts from "@/components/modals/addConcept";
 
 export default function SubirFactura() {
   const [imageUri, setImageUri] = useState<string | null>(null);
   const [isModalVisible, setIsModalVisible] = useState(false); // Controla la visibilidad del modal
+  const [isAddConceptsModalVisible, setIsAddConceptsModalVisible] = useState(false); // Modal para agregar conceptos
+
   const router = useRouter();
   const { eventoId, participanteId } = useLocalSearchParams();
 
@@ -70,14 +73,33 @@ export default function SubirFactura() {
         visible={isModalVisible}
         onClose={() => setIsModalVisible(false)} // Oculta el modal
         onSplitEqually={() => {
-          setIsModalVisible(false); // Oculta el modal
-          console.log("Repartir gastos equitativamente");
+          setIsModalVisible(false); // Cierra el modal de LoadReceipt
+          setIsAddConceptsModalVisible(true); // Abre el modal de Agregar Conceptos
         }}
         onAssignIndividually={() => {
           setIsModalVisible(false); // Oculta el modal
+          router.push({
+            pathname: "../(user)/AsignacionIndividual",
+            params: {
+              eventoId,
+              participanteId,
+              tipoAsignacion: "equitativa", // Puedes agregar más parámetros según sea necesario
+            },
+          });
           console.log("Asignar gastos de manera individual");
         }}
       />
+
+       {/* Modal AddConcepts */}
+      <AddConcepts
+        visible={isAddConceptsModalVisible}
+        onClose={() => setIsAddConceptsModalVisible(false)} // Cierra el modal de Agregar Conceptos
+        onRepartir={() => {
+          // Aquí puedes manejar la lógica para agregar el concepto y monto
+          setIsAddConceptsModalVisible(false); // Cierra el modal después de agregar
+        }}
+      />
+      
     </View>
   );
 }
