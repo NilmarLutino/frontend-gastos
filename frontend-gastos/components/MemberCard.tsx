@@ -5,11 +5,12 @@ import {
   StyleSheet,
   TouchableOpacity,
   FlatList,
-  Button,
   Alert,
 } from "react-native";
 import { FontAwesome } from "@expo/vector-icons";
 import AddExpenses from "./modals/addExpenses";
+import DeleteExpenses from "./modals/deleteExpenses";
+import DeleteMember from "./modals/deleteMember";
 import { createExpense, fetchParticipantById } from "../services/eventService";
 import { useRouter } from "expo-router";
 
@@ -39,12 +40,14 @@ export default function MemberCard({
   const router = useRouter();
   const [isExpanded, setIsExpanded] = useState(false);
   const [isAddExpensesVisible, setAddExpensesVisible] = useState(false);
+  const [isDeleteExpenseVisible, setDeleteExpenseVisible] = useState(false);
+  const [isDeleteMemberVisible, setDeleteMemberVisible] = useState(false);
+  const [selectedExpense, setSelectedExpense] = useState<Expense | null>(null);
+  const [selectedMember, setSelectedMember] = useState<any>(null);
 
   const toggleExpand = () => {
     setIsExpanded(!isExpanded);
   };
-  //console.log("miembro: ", member.id);
-      
 
   const handleAgregarGasto = async (concepto: string, monto: string) => {
     try {
@@ -53,17 +56,15 @@ export default function MemberCard({
         return;
       }
 
-      // Obtener el detalle del participante para extraer el usuario_id
       const participantDetails = await fetchParticipantById(member.id);
       const usuarioId = participantDetails.usuario_id;
 
-      // Llama a la API para crear el nuevo gasto usando usuarioId
       await createExpense(
         parseInt(groupId),
         parseFloat(monto),
         "Alimentación",
         concepto,
-        usuarioId // Usar el usuario_id obtenido
+        usuarioId
       );
 
       setAddExpensesVisible(false);
@@ -75,13 +76,52 @@ export default function MemberCard({
     }
   };
 
+  const handleDeleteExpense = async () => {
+    try {
+      if (!selectedExpense) return;
+
+      // Aquí deberías llamar a tu API para eliminar el gasto seleccionado
+      console.log(`Eliminando gasto: ${selectedExpense.item}`);
+      setDeleteExpenseVisible(false);
+      onRefresh();
+      Alert.alert("Éxito", "Gasto eliminado correctamente");
+    } catch (error) {
+      console.error("Error al eliminar gasto:", error);
+      Alert.alert("Error", "Hubo un problema al eliminar el gasto.");
+    }
+  };
+
+  const handleDeleteMember = async () => {
+    try {
+      if (!selectedMember) return;
+
+      // Aquí deberías llamar a tu API para eliminar el miembro seleccionado
+      console.log(`Eliminando miembro: ${member.name}`);
+      setDeleteMemberVisible(false);
+      onRefresh();
+      Alert.alert("Éxito", "Miembro eliminado correctamente");
+    } catch (error) {
+      console.error("Error al eliminar miembro:", error);
+      Alert.alert("Error", "Hubo un problema al eliminar el miembro.");
+    }
+  };
+
   return (
     <View style={styles.card}>
+      <TouchableOpacity
+        style={styles.delete_member}
+        onPress={() => {
+          setSelectedMember(member);
+          setDeleteMemberVisible(true)
+        }}
+      >
+        <FontAwesome name="trash" size={20} color="#BF0413" />
+      </TouchableOpacity>
       <TouchableOpacity style={styles.header} onPress={toggleExpand}>
         <Text style={styles.memberName}>{member.name}</Text>
-        <Text style={styles.balance}>{member.balance}$</Text>
+        <Text style={styles.balance}>{member.balance} Bs.</Text>
       </TouchableOpacity>
-  
+
       {isExpanded && (
         <View style={styles.expandedContent}>
           <FlatList
@@ -89,13 +129,21 @@ export default function MemberCard({
             renderItem={({ item }) => (
               <View style={styles.expenseItem}>
                 <Text style={styles.expenseText}>{item.item}</Text>
-                <Text style={styles.expenseText}>{item.amount}$</Text>
+                <Text style={styles.expenseText}>{item.amount} Bs.</Text>
+                <TouchableOpacity
+                  style={styles.delete_expense}
+                  onPress={() => {
+                    setSelectedExpense(item);
+                    setDeleteExpenseVisible(true);
+                  }}
+                >
+                  <FontAwesome name="trash" size={20} color="#BF0413" />
+                </TouchableOpacity>
               </View>
             )}
             keyExtractor={(item, index) => index.toString()}
           />
-  
-          {/* Mostrar botones solo si el usuario es "Propietario" */}
+
           {userRole === "Propietario" && (
             <View style={styles.actions}>
               <TouchableOpacity
@@ -103,8 +151,11 @@ export default function MemberCard({
                 onPress={() =>
                   router.push({
                     pathname: "../(user)/ComprobanteDetail",
-                    params: { eventoId: groupId, participanteId: member.id, userRole: "Propietario" },
-                    
+                    params: {
+                      eventoId: groupId,
+                      participanteId: member.id,
+                      userRole: "Propietario",
+                    },
                   })
                 }
               >
@@ -120,7 +171,7 @@ export default function MemberCard({
           )}
         </View>
       )}
-  
+
       <TouchableOpacity style={styles.deploy} onPress={toggleExpand}>
         <FontAwesome
           name={isExpanded ? "chevron-up" : "chevron-down"}
@@ -128,16 +179,31 @@ export default function MemberCard({
           color="#f2f2f2"
         />
       </TouchableOpacity>
-  
+
       {/* Modal para añadir gastos */}
       <AddExpenses
         visible={isAddExpensesVisible}
         onClose={() => setAddExpensesVisible(false)}
         onAgregar={handleAgregarGasto}
       />
+
+      {/* Modal para confirmar eliminación de gasto */}
+      <DeleteExpenses
+        visible={isDeleteExpenseVisible}
+        onClose={() => setDeleteExpenseVisible(false)}
+        onConfirm={handleDeleteExpense}
+        message={`¿Estás seguro de que deseas eliminar el gasto "${selectedExpense?.item}"?`}
+      />
+
+      {/* Modal para confirmar eliminación de miembro */}
+      <DeleteMember
+        visible={isDeleteMemberVisible}
+        onClose={() => setDeleteMemberVisible(false)}
+        onConfirm={handleDeleteMember}
+        message={`¿Estás seguro de que deseas eliminar a ${member.name}?`}
+      />
     </View>
   );
-  
 }
 
 const styles = StyleSheet.create({
@@ -156,7 +222,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     width: "100%",
-    padding: 20,
+    paddingHorizontal: 20,
+    paddingVertical: 10,
   },
   memberName: {
     fontSize: 18,
@@ -174,7 +241,7 @@ const styles = StyleSheet.create({
   },
   expenseItem: {
     flexDirection: "row",
-    justifyContent: "space-between",
+    justifyContent: "space-around",
     marginTop: 5,
     paddingHorizontal: 30,
     width: "100%",
@@ -210,12 +277,20 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   deploy: {
-
     backgroundColor: "#BF0413",
     width: "100%",
     alignItems: "center",
     paddingVertical: 5,
     borderBottomLeftRadius: 5,
     borderBottomRightRadius: 5,
+  },
+  delete_member: {
+    alignSelf: "flex-end",
+    paddingRight: 10,
+    paddingTop: 10,
+  },
+  delete_expense: {
+    alignSelf: "flex-end",
+    paddingRight: 10,
   },
 });

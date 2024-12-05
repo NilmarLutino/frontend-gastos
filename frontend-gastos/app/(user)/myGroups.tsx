@@ -136,7 +136,7 @@ export default function MyGroups() {
   return (
     <View style={styles.container}>
       <Text style={styles.welcomeText}>
-        Welcome to My Groups, {user?.emailAddresses[0].emailAddress}
+        Bienvenido, {user?.emailAddresses[0].emailAddress}
       </Text>
       <FlatList
         style={styles.groupList}

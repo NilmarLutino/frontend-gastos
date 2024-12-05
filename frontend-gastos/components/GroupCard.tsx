@@ -1,6 +1,7 @@
 import React from "react";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, Alert } from "react-native";
 import { useRouter } from "expo-router";
+import DeleteGroup from "./modals/deleteGroup";
 import { FontAwesome } from "@expo/vector-icons";
 
 type GroupCardProps = {
@@ -25,16 +26,37 @@ export default function GroupCard({
   userId,
 }: GroupCardProps) {
   const router = useRouter();
+  const [deleteGroupVisible, setDeleteGroupVisible] = React.useState(false);
+  const [selectedGroup, setSelectedGroup] = React.useState("");
+  const userRole = userId === creadoPor ? "Propietario" : "Invitado";
 
   const handleDetails = () => {
     router.push({ pathname: "/(user)/groupDetailPage", params: { groupId, userRole } });
-    console.log(groupId, userRole);
   };
 
-  const userRole = userId === creadoPor ? "Propietario" : "Invitado";
+  const handleDeleteGroup = async () => {
+    try {
+      console.log(`Eliminando grupo: ${selectedGroup}`);
+      setDeleteGroupVisible(false);
+      Alert.alert("Éxito", "Grupo eliminado correctamente");
+      // Aquí puedes incluir la lógica de actualización (onRefresh, etc.)
+    } catch (error) {
+      console.error("Error al eliminar grupo:", error);
+      Alert.alert("Error", "Hubo un problema al eliminar el grupo.");
+    }
+  };
 
   return (
     <View style={styles.card}>
+      <TouchableOpacity
+        style={styles.delete_group}
+        onPress={() => {
+          setSelectedGroup(groupName);
+          setDeleteGroupVisible(true);
+        }}
+      >
+        <FontAwesome name="trash" size={20} color="#BF0413" />
+      </TouchableOpacity>
       <View style={styles.cardHeader}>
         <Text style={styles.groupTitle}>{groupName}</Text>
         <View style={styles.dateContainer}>
@@ -42,14 +64,26 @@ export default function GroupCard({
           <Text style={styles.roleText}>{userRole}</Text>
         </View>
       </View>
-      <Text style={styles.details}>Integrantes: <Text style={styles.ammo}>{members}</Text></Text>
-      <Text style={styles.details}>Gastos totales: <Text style={styles.ammo}>{expenses}$</Text></Text>
-      <Text style={styles.details}>Pagados: <Text style={styles.ammo}>{paid}</Text></Text>
-      
-
+      <Text style={styles.details}>
+        Integrantes: <Text style={styles.ammo}>{members}</Text>
+      </Text>
+      <Text style={styles.details}>
+        Gastos totales: <Text style={styles.ammo}>{expenses} Bs.</Text>
+      </Text>
+      <Text style={styles.details}>
+        Pagados: <Text style={styles.ammo}>{paid}</Text>
+      </Text>
       <TouchableOpacity style={styles.detailsButton} onPress={handleDetails}>
         <Text style={styles.detailsButtonText}>Ver Detalles</Text>
       </TouchableOpacity>
+
+      {/* Modal DeleteGroup */}
+      <DeleteGroup
+        visible={deleteGroupVisible}
+        onClose={() => setDeleteGroupVisible(false)}
+        onConfirm={handleDeleteGroup}
+        message={`¿Estás seguro de que deseas eliminar el grupo "${selectedGroup}"?`}
+      />
     </View>
   );
 }
@@ -119,11 +153,11 @@ const styles = StyleSheet.create({
     color: "#f2f2f2",
     fontSize: 16,
     textAlign: "center",
-    fontWeight: 500,
+    fontWeight: "500",
   },
-  buttonContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginTop: 10,
+  delete_group: {
+    alignSelf: "flex-end",
+    paddingRight: 10,
+    paddingTop: 10,
   },
 });
