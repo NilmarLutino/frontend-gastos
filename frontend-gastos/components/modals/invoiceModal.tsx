@@ -1,7 +1,14 @@
 import React, { useState } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, Modal, ScrollView } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Modal,
+  ScrollView,
+  Alert,
+} from "react-native";
 import { Picker } from "@react-native-picker/picker";
-import { useRouter, useLocalSearchParams } from "expo-router";
 
 type InvoiceItem = {
   description: string;
@@ -15,14 +22,18 @@ const staticData: InvoiceItem[] = [
 
 type InvoiceModalProps = {
   visible: boolean;
+  onClose: () => void;
   onAssign: (selectedUsers: string[]) => void;
 };
 
-export default function InvoiceModal({ visible, onAssign }: InvoiceModalProps) {
+export default function InvoiceModal({
+  visible,
+  onClose,
+  onAssign,
+}: InvoiceModalProps) {
   const [selectedUsers, setSelectedUsers] = useState<string[]>(
     Array(staticData.length).fill("")
   );
-  const router = useRouter();
 
   const users = ["Usuario 1", "Usuario 2", "Usuario 3"];
 
@@ -32,10 +43,19 @@ export default function InvoiceModal({ visible, onAssign }: InvoiceModalProps) {
     setSelectedUsers(updatedUsers);
   };
 
+  const handleAssign = () => {
+    if (selectedUsers.some((user) => user === "")) {
+      Alert.alert("Error", "Por favor, selecciona un usuario para cada producto.");
+      return;
+    }
+    onAssign(selectedUsers);
+    onClose();
+  };
+
   return (
-    <Modal visible={visible} transparent animationType="slide">
-      <View style={styles.modalBackground}>
-        <View style={styles.modalContainer}>
+    <Modal visible={visible} animationType="slide" transparent>
+      <View style={styles.modalContainer}>
+        <View style={styles.modalContent}>
           <Text style={styles.title}>Detalles de la Factura</Text>
           <ScrollView style={styles.scroll}>
             {staticData.map((item, index) => (
@@ -56,15 +76,11 @@ export default function InvoiceModal({ visible, onAssign }: InvoiceModalProps) {
             ))}
           </ScrollView>
           <View style={styles.buttonContainer}>
-            <TouchableOpacity
-              style={styles.button}
-              onPress={() => onAssign(selectedUsers)}
-            >
+            <TouchableOpacity style={styles.button} onPress={handleAssign}>
               <Text style={styles.buttonText}>Asignar</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.button} onPress={() => router.back()}>
+            <TouchableOpacity style={styles.button} onPress={onClose}>
               <Text style={styles.buttonText}>Cerrar</Text>
-              
             </TouchableOpacity>
           </View>
         </View>
@@ -74,28 +90,24 @@ export default function InvoiceModal({ visible, onAssign }: InvoiceModalProps) {
 }
 
 const styles = StyleSheet.create({
-  modalBackground: {
+  modalContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
-  modalContainer: {
+  modalContent: {
     width: "90%",
-    backgroundColor: "#fff",
-    borderRadius: 10,
     padding: 20,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5,
+    backgroundColor: "#FDF6F0",
+    borderRadius: 10,
   },
   title: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: "bold",
-    marginBottom: 15,
+    marginBottom: 20,
     textAlign: "center",
+    color: "#262626",
   },
   scroll: {
     maxHeight: 300,
@@ -105,9 +117,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     marginVertical: 10,
-    paddingVertical: 10,
     borderBottomWidth: 1,
     borderBottomColor: "#ccc",
+    paddingBottom: 10,
   },
   description: {
     flex: 2,
@@ -126,20 +138,21 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     flexDirection: "row",
-    justifyContent: "space-around",
+    justifyContent: "space-between",
     marginTop: 20,
   },
   button: {
-    flex: 1,
     backgroundColor: "#BF0413",
-    paddingVertical: 10,
-    marginHorizontal: 5,
+    paddingVertical: 12,
+    paddingHorizontal: 20,
     borderRadius: 5,
     alignItems: "center",
+    flex: 1,
+    marginHorizontal: 5,
   },
   buttonText: {
     color: "#fff",
-    fontSize: 16,
     fontWeight: "bold",
+    fontSize: 16,
   },
 });

@@ -4,11 +4,13 @@ import * as ImagePicker from "expo-image-picker";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import LoadReceipt from "@/components/modals/loadReceipt";
 import AddConcepts from "@/components/modals/addConcept";
+import InvoiceModal from "@/components/modals/invoiceModal";
 
 export default function SubirFactura() {
   const [imageUri, setImageUri] = useState<string | null>(null);
   const [isModalVisible, setIsModalVisible] = useState(false); // Controla la visibilidad del modal
   const [isAddConceptsModalVisible, setIsAddConceptsModalVisible] = useState(false); // Modal para agregar conceptos
+  const [isInvoiceModalVisible, setIsInvoiceModalVisible] = useState(false); // Modal para asignar facturas
 
   const router = useRouter();
   const { eventoId, participanteId } = useLocalSearchParams();
@@ -78,14 +80,7 @@ export default function SubirFactura() {
         }}
         onAssignIndividually={() => {
           setIsModalVisible(false); // Oculta el modal
-          router.push({
-            pathname: "../(user)/AsignacionIndividual",
-            params: {
-              eventoId,
-              participanteId,
-              tipoAsignacion: "equitativa", // Puedes agregar más parámetros según sea necesario
-            },
-          });
+          setIsInvoiceModalVisible(true); // Muestra el modal de asignar facturas
           console.log("Asignar gastos de manera individual");
         }}
       />
@@ -97,6 +92,16 @@ export default function SubirFactura() {
         onRepartir={() => {
           // Aquí puedes manejar la lógica para agregar el concepto y monto
           setIsAddConceptsModalVisible(false); // Cierra el modal después de agregar
+        }}
+      />
+
+      {/* Modal InvoiceModal */}
+      <InvoiceModal
+        visible={isInvoiceModalVisible}
+        onClose={() => setIsInvoiceModalVisible(false)} // Cierra el modal de asignar facturas
+        onAssign={(selectedUsers: string[]) => {
+          // Aquí puedes manejar la lógica para asignar las facturas
+          setIsInvoiceModalVisible(false); // Cierra el modal después de asignar
         }}
       />
       
