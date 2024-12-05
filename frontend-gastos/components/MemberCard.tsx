@@ -49,8 +49,6 @@ export default function MemberCard({
   const [selectedMember, setSelectedMember] = useState<any>(null);
   const [rolesId, setRolesId] = useState<number | null>(null);
 
-  console.log("expenses", member.expenses);
-
   useEffect(() => {
     // Obtener el roles_id al cargar el componente
     const fetchRolesId = async () => {
@@ -137,6 +135,18 @@ export default function MemberCard({
         Alert.alert("Error", "No se ha seleccionado un miembro para eliminar.");
         return;
       }
+      console.log("expenses miembro", selectedMember.id);
+      // Verificar si el participante tiene gastos asociados
+      if (selectedMember.expenses && selectedMember.expenses.length > 0) {
+        setWarningVisible(true);
+        Alert.alert(
+          "Error",
+          "No se puede eliminar este participante porque tiene gastos activos."
+        );
+        return;
+      }
+  
+      // Realiza la solicitud DELETE al endpoint
       const response = await fetch(
         `${API_BASE_URL}/api/participantes/${selectedMember.id}`,
         {
@@ -146,9 +156,10 @@ export default function MemberCard({
           },
         }
       );
+  
       if (response.ok) {
         setDeleteMemberVisible(false);
-        onRefresh();
+        onRefresh(); // Refresca los datos después de eliminar el miembro
         Alert.alert("Éxito", "Miembro eliminado correctamente");
       } else {
         const errorData = await response.json();
@@ -159,7 +170,8 @@ export default function MemberCard({
       console.error("Error al eliminar miembro:", error);
       Alert.alert("Error", "Hubo un problema al eliminar el miembro.");
     }
-  };  
+  };
+
 
   return (
     <View style={styles.card}>
@@ -257,11 +269,12 @@ export default function MemberCard({
 
       {/* Modal para confirmar eliminación de miembro */}
       <DeleteMember
-        visible={isDeleteMemberVisible}
-        onClose={() => setDeleteMemberVisible(false)}
-        onConfirm={handleDeleteMember}
-        message={`¿Estás seguro de que deseas eliminar a ${member.name}?`}
-      />
+  visible={isDeleteMemberVisible}
+  onClose={() => setDeleteMemberVisible(false)}
+  onConfirm={handleDeleteMember}
+  message={`¿Estás seguro de que deseas eliminar a ${selectedMember?.name}?`}
+/>
+
 
       <WarningModal
         visible={isWarningVisible}
